@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="hi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>सरकारी योजना और फॉर्म अलर्ट 3D SaaS पोर्टल | Engineered by Gaurav Dubey</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #030612;
+      color: #f8fafc;
+      overflow-x: hidden;
+      perspective: 1400px;
+    }
+
+    /* FULL-SCREEN 3D WEBGL UNIVERSE BACKGROUND */
+    #bg-webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* TRUE 3D ROTATING CUBE IN NAVBAR */
+    .cube-scene {
+      width: 42px;
+      height: 42px;
+      perspective: 220px;
+    }
+    .cube-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: spinCube3D 9s infinite linear;
+    }
+    .cube-face {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border: 1.5px solid rgba(56, 189, 248, 0.85);
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.35), rgba(79, 70, 229, 0.45));
+      box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: #fff;
+      backdrop-filter: blur(4px);
+    }
+    .cube-front  { transform: rotateY(  0deg) translateZ(21px); }
+    .cube-back   { transform: rotateY(180deg) translateZ(21px); }
+    .cube-right  { transform: rotateY( 90deg) translateZ(21px); }
+    .cube-left   { transform: rotateY(-90deg) translateZ(21px); }
+    .cube-top    { transform: rotateX( 90deg) translateZ(21px); }
+    .cube-bottom { transform: rotateX(-90deg) translateZ(21px); }
+
+    @keyframes spinCube3D {
+      0%   { transform: rotateX(-18deg) rotateY(0deg) rotateZ(0deg); }
+      50%  { transform: rotateX(22deg) rotateY(180deg) rotateZ(8deg); }
+      100% { transform: rotateX(-18deg) rotateY(360deg) rotateZ(0deg); }
+    }
+
+    /* SPATIAL 3D GLASS PANELS */
+    .glass-panel {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 13, 28, 0.86));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      box-shadow:
+        0 25px 60px -15px rgba(0, 0, 0, 0.85),
+        0 0 30px rgba(14, 165, 233, 0.12),
+        inset 0 1px 2px rgba(255, 255, 255, 0.18);
+    }
+
+    /* TRUE MULTI-LAYER 3D EXTRUDED CARDS */
+    .card-3d {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+      will-change: transform;
+      background: linear-gradient(155deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 14, 30, 0.94) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      box-shadow:
+        0 18px 0 -6px rgba(15, 23, 42, 0.95),
+        0 24px 48px -10px rgba(0, 0, 0, 0.85),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+    .card-3d::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        420px circle at var(--mouse-x, 50%) var(--mouse-y, 30%),
+        rgba(56, 189, 248, 0.22),
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+    .card-3d:hover::before {
+      opacity: 1;
+    }
+    .card-3d:hover {
+      border-color: rgba(34, 211, 238, 0.85);
+      box-shadow:
+        0 22px 0 -8px rgba(8, 47, 73, 0.8),
+        0 35px 70px -12px rgba(6, 182, 212, 0.38),
+        0 0 35px rgba(99, 102, 241, 0.28);
+    }
+    .layer-z-10 { transform: translateZ(16px); }
+    .layer-z-20 { transform: translateZ(28px); }
+    .layer-z-30 { transform: translateZ(42px); }
+
+    /* 3D DECK VIEW MODES */
+    .deck-coverflow .card-3d:nth-child(3n+1) {
+      transform: perspective(1100px) rotateY(14deg) translateZ(10px);
+    }
+    .deck-coverflow .card-3d:nth-child(3n+2) {
+      transform: perspective(1100px) translateZ(35px) scale(1.02);
+      border-color: rgba(56, 189, 248, 0.75);
+    }
+    .deck-coverflow .card-3d:nth-child(3n) {
+      transform: perspective(1100px) rotateY(-14deg) translateZ(10px);
+    }
+    .deck-isometric {
+      transform: perspective(1600px) rotateX(10deg) rotateY(-6deg);
+      transform-style: preserve-3d;
+    }
+
+    /* 3D MECHANICAL TACTILE BUTTONS */
+    .btn-3d {
+      position: relative;
+      transition: all 0.15s ease;
+      transform: translateY(0) translateZ(20px);
+      box-shadow: 0 6px 0 #1e3a8a, 0 12px 24px rgba(14, 165, 233, 0.35), inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .btn-3d:hover {
+      transform: translateY(-2px) translateZ(25px);
+      box-shadow: 0 8px 0 #1e3a8a, 0 16px 30px rgba(14, 165, 233, 0.5), inset 0 1px 1px rgba(255,255,255,0.5);
+    }
+    .btn-3d:active {
+      transform: translateY(4px) translateZ(10px);
+      box-shadow: 0 2px 0 #1e3a8a, 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .btn-emerald-3d {
+      position: relative;
+      transition: all 0.15s ease;
+      transform: translateY(0) translateZ(20px);
+      box-shadow: 0 6px 0 #065f46, 0 12px 24px rgba(16, 185, 129, 0.35), inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .btn-emerald-3d:hover {
+      transform: translateY(-2px) translateZ(25px);
+      box-shadow: 0 8px 0 #065f46, 0 16px 30px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255,255,255,0.5);
+    }
+    .btn-emerald-3d:active {
+      transform: translateY(4px) translateZ(10px);
+      box-shadow: 0 2px 0 #065f46, 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .btn-amber-3d {
+      position: relative;
+      transition: all 0.15s ease;
+      box-shadow: 0 5px 0 #92400e, 0 10px 22px rgba(245, 158, 11, 0.3), inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .btn-amber-3d:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #92400e;
+    }
+
+    .neon-badge {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.24), rgba(99, 102, 241, 0.28));
+      border: 1px solid rgba(56, 189, 248, 0.55);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    @keyframes tickerMove {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: tickerMove 30s linear infinite;
+    }
+    .ticker-track:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotateX(4deg); }
+      50% { transform: translateY(-7px) rotateX(-4deg); }
+    }
+    .float-3d-badge {
+      animation: floatSlow 4.5s ease-in-out infinite;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #050814; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; border: 1px solid rgba(56,189,248,0.3); }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-cyan-400 selection:text-slate-950 relative">
+
+  <!-- FULL-VIEWPORT 3D WEBGL SPATIAL UNIVERSE CANVAS -->
+  <canvas id="bg-webgl-canvas"></canvas>
+
+  <!-- TOP LIVE ALERT TICKER + DEVELOPER GAURAV DUBEY RIBBON -->
+  <div class="relative z-30 bg-gradient-to-r from-indigo-950/95 via-slate-900/95 to-cyan-950/95 border-b border-cyan-500/40 py-2 px-3 overflow-hidden backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 overflow-hidden flex-1">
+        <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-lg shadow-rose-500/30 animate-pulse">
+          ● LIVE 3D PORTAL
+        </span>
+        <div class="overflow-hidden flex-1">
+          <div class="ticker-track text-xs sm:text-sm text-cyan-200 font-semibold gap-10">
+            <span>🔥 बिहार मुख्यमंत्री उद्यमी योजना: ₹10 लाख तक युवा स्टार्टअप सहायता (50% अनुदान) — आवेदन गाइड उपलब्ध!</span>
+            <span>🎓 बिहार पोस्ट मैट्रिक स्कॉलरशिप (BC/EBC/SC/ST): ₹2,000 से ₹15,000+ छात्रवृत्ति — घर बैठे मात्र ₹50 में फॉर्म भरवाएं!</span>
+            <span>📸 नया SaaS फीचर: लाइव सरकारी फोटो और सिग्नेचर रीसाइज़र (Name + Date स्टैम्प के साथ) अब पोर्टल में मुफ्त उपलब्ध!</span>
+            <span>💼 रेलवे एवं SSC बंपर भर्ती 2026: 10वीं/12वीं/स्नातक पास युवाओं के लिए सुनहरा मौका — पात्रता अभी चेक करें!</span>
+            <span>🔥 बिहार मुख्यमंत्री उद्यमी योजना: ₹10 लाख तक युवा स्टार्टअप सहायता (50% अनुदान) — आवेदन गाइड उपलब्ध!</span>
+          </div>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center gap-2 shrink-0 px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/50 text-amber-300 text-xs font-extrabold">
+        <span>⚡ Architect: Gaurav Dubey</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY 3D SPATIAL NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-cyan-500/30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- True 3D Rotating Cube Brand Logo + Gaurav Dubey Credit -->
+      <button id="brand-home-btn" type="button" class="flex items-center gap-3.5 text-left group focus:outline-none">
+        <div class="cube-scene shrink-0" aria-hidden="true">
+          <div class="cube-3d">
+            <div class="cube-face cube-front">जन</div>
+            <div class="cube-face cube-back">AI</div>
+            <div class="cube-face cube-right">सेवा</div>
+            <div class="cube-face cube-left">3D</div>
+            <div class="cube-face cube-top">OS</div>
+            <div class="cube-face cube-bottom">GD</div>
+          </div>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-lg sm:text-xl font-black tracking-tight bg-gradient-to-r from-white via-cyan-200 to-indigo-300 bg-clip-text text-transparent">
+              जन-सेवा 3D SaaS पोर्टल
+            </span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/25 to-orange-500/25 text-amber-300 border border-amber-400/50 shadow-sm">
+              By Gaurav Dubey
+            </span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-cyan-300/80 font-medium">
+            World's First 3D WebGL Sarkari Yojana • Form Seva • Photo SaaS • AI Copilot
+          </p>
+        </div>
+      </button>
+
+      <!-- Main Navigation Tabs -->
+      <nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto max-w-full py-1" aria-label="Main Navigation">
+        <button type="button" data-page="home" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20 shrink-0">
+          🏠 होम (3D अलर्ट्स)
+        </button>
+        <button type="button" data-page="saastools" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 shrink-0">
+          🛠️ SaaS टूल्स (Photo/Tracker)
+        </button>
+        <button type="button" data-page="eligibility" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800/80 shrink-0">
+          🎯 पात्रता चेकर (AI)
+        </button>
+        <button type="button" data-page="formseva" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800/80 shrink-0">
+          📝 फॉर्म भरवाएं (₹50)
+        </button>
+        <button type="button" data-page="links" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800/80 shrink-0">
+          🔗 सभी सरकारी लिंक
+        </button>
+        <button type="button" data-page="automation" class="nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 shrink-0">
+          🤖 Free ऑटोमेशन & कोड
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="relative z-20 flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-8">
+
+    <!-- ========================================== -->
+    <!-- PAGE 1: HOME & 3D HOLOGRAPHIC COMMAND DECK -->
+    <!-- ========================================== -->
+    <section id="page-home" class="space-y-8">
+
+      <!-- 3D HOLOGRAPHIC HERO DECK (VISIBLE IMMEDIATELY ON ALL SCREENS!) -->
+      <div class="relative rounded-3xl overflow-hidden glass-panel border border-cyan-400/40 p-5 sm:p-7 lg:p-9">
+        <!-- Top Bar: Founder Gaurav Dubey Signature & 3D Scene Mode Switcher -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-5 border-b border-slate-800/90">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neon-badge text-cyan-200 text-xs sm:text-sm font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>🚀 India's First 3D Spatial GovTech SaaS • Built by <strong class="text-amber-300">Gaurav Dubey</strong></span>
+          </div>
+
+          <!-- Interactive 3D Hologram Scene Mode Switcher -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] text-slate-400 font-bold mr-1">🎮 3D होलोग्राम मोड:</span>
+            <button type="button" data-scene-mode="globe" class="scene-mode-btn px-2.5 py-1 rounded-lg bg-cyan-500 text-slate-950 font-extrabold text-xs transition-all">
+              🌐 3D साइबर ग्लोब
+            </button>
+            <button type="button" data-scene-mode="torus" class="scene-mode-btn px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-300 hover:bg-slate-700 font-bold text-xs transition-all">
+              🧬 AI न्यूरल कोर
+            </button>
+            <button type="button" data-scene-mode="pillars" class="scene-mode-btn px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-300 hover:bg-slate-700 font-bold text-xs transition-all">
+              🏛️ 3D शक्ति चक्र
+            </button>
+          </div>
+        </div>
+
+        <!-- Always Side-by-Side on MD+ AND Interactive 3D Stage Right at the Top! -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <!-- Interactive 3D WebGL Hologram Core -->
+          <div class="md:col-span-5 order-1 md:order-2 flex flex-col items-center">
+            <div id="three-container" class="relative w-full h-64 sm:h-72 rounded-3xl bg-gradient-to-b from-slate-950/90 via-indigo-950/70 to-slate-950/90 border-2 border-cyan-400/50 overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(6,182,212,0.28)]">
+              <canvas id="three-hero-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+              <div class="absolute top-3 left-3 px-3 py-1 rounded-xl bg-slate-950/85 border border-cyan-400/40 text-[11px] text-cyan-300 font-bold pointer-events-none flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>3D WebGL Engine • 60 FPS (माउस घुमाएं)</span>
+              </div>
+
+              <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-400/40 text-[10px] text-amber-200 font-bold pointer-events-none">
+                👨‍💻 Dev: Gaurav Dubey
+              </div>
+
+              <button id="toggle-3d-spin-btn" type="button" class="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-slate-900/95 hover:bg-slate-800 border border-cyan-500/40 text-xs text-cyan-200 font-bold shadow-lg">
+                ⏸ 3D रोटेशन रोकें
+              </button>
+            </div>
+
+            <!-- Quick Social & SaaS Launchpad Bar under 3D Core -->
+            <div class="w-full mt-3 grid grid-cols-3 gap-2">
+              <a id="hero-whatsapp-link" href="https://whatsapp.com/channel/0029Va" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-400/50 text-emerald-300 text-xs font-extrabold transition-all">
+                <span>💬 WhatsApp चैनल</span>
+              </a>
+              <a id="hero-telegram-link" href="https://t.me/SarkariSevaPortal" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-sky-600/25 hover:bg-sky-600/40 border border-sky-400/50 text-sky-300 text-xs font-extrabold transition-all">
+                <span>✈️ Telegram ग्रुप</span>
+              </a>
+              <a id="hero-instagram-link" href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-pink-600/25 hover:bg-pink-600/40 border border-pink-400/50 text-pink-300 text-xs font-extrabold transition-all">
+                <span>📸 Instagram पेज</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Left Column: Hero Copy & 3D Tactile CTAs -->
+          <div class="md:col-span-7 order-2 md:order-1 space-y-4">
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight text-white tracking-tight">
+              सही समय पर सरल हिंदी में <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(56,189,248,0.4)]">सरकारी अपडेट</span>, AI टूल्स और घर बैठे फॉर्म सेवा!
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-base leading-relaxed">
+              <strong>Gaurav Dubey</strong> द्वारा डिज़ाइन किया गया भारत का पहला <strong>3D GovTech SaaS प्लेटफॉर्म</strong>। यहाँ सिर्फ योजनाओं की जानकारी नहीं मिलती—बल्कि <strong>लाइव सरकारी फोटो/सिग्नेचर रीसाइज़र</strong>, <strong>AI पात्रता चेकर</strong>, <strong>हिंदी वॉइस गाइड</strong> और <strong>मात्र ₹50 में घर बैठे फॉर्म भरवाने</strong> की पूरी सुविधा एक ही जगह उपलब्ध है।
+            </p>
+
+            <!-- 3D Action Buttons -->
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <button id="hero-book-form-btn" type="button" class="btn-emerald-3d px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2">
+                <span>📝 घर बैठे फॉर्म भरवाएं (मात्र ₹50)</span>
+              </button>
+              <button id="hero-check-elig-btn" type="button" class="btn-3d px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2">
+                <span>🎯 अपनी पात्रता चेक करें</span>
+              </button>
+              <button id="hero-open-saas-btn" type="button" class="btn-amber-3d px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-1.5">
+                <span>📸 फोटो/सिग्नेचर रीसाइज़र SaaS</span>
+              </button>
+              <button id="hero-open-automation-btn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 font-bold text-xs transition-all">
+                ⚙️ ऑटोमेशन रोडमैप और कोड देखें
+              </button>
+            </div>
+
+            <!-- 3D Floating KPI Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+              <div class="float-3d-badge p-3 rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-lg">
+                <div class="text-lg sm:text-xl font-black text-cyan-400" id="stat-active-schemes">12+</div>
+                <div class="text-[11px] text-slate-300 font-semibold">सक्रिय योजनाएं व फॉर्म</div>
+              </div>
+              <div class="float-3d-badge p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/30 shadow-lg" style="animation-delay:0.6s">
+                <div class="text-lg sm:text-xl font-black text-emerald-400">₹50</div>
+                <div class="text-[11px] text-slate-300 font-semibold">एक्सपर्ट फॉर्म सेवा</div>
+              </div>
+              <div class="float-3d-badge p-3 rounded-2xl bg-slate-900/90 border border-amber-500/30 shadow-lg" style="animation-delay:1.2s">
+                <div class="text-lg sm:text-xl font-black text-amber-400">4 SaaS</div>
+                <div class="text-[11px] text-slate-300 font-semibold">फोटो, AI व ट्रैकर टूल्स</div>
+              </div>
+              <div class="float-3d-badge p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 shadow-lg" style="animation-delay:1.8s">
+                <div class="text-lg sm:text-xl font-black text-indigo-400">24×7</div>
+                <div class="text-[11px] text-slate-300 font-semibold">AI + Telegram अलर्ट</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D SPATIAL VIEW SWITCHER + FILTER & SEARCH BAR -->
+      <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4 border border-cyan-500/30">
+        <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+          <!-- Category Filter Buttons -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1" id="category-filter-bar">
+            <button type="button" data-cat="all" class="cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-cyan-500 text-slate-950 shrink-0 shadow-md shadow-cyan-500/20">
+              🌟 सभी अपडेट्स (12)
+            </button>
+            <button type="button" data-cat="yojana" class="cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0">
+              🏛️ सरकारी योजना
+            </button>
+            <button type="button" data-cat="scholarship" class="cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0">
+              🎓 स्कॉलरशिप
+            </button>
+            <button type="button" data-cat="job" class="cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0">
+              💼 सरकारी नौकरी
+            </button>
+            <button type="button" data-cat="saved" class="cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-amber-300 hover:bg-slate-700 shrink-0">
+              🔖 सेव किए गए (<span id="saved-count-badge">0</span>)
+            </button>
+          </div>
+
+          <!-- 3D Deck Perspective Switcher + Search -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex items-center rounded-xl bg-slate-950 p-1 border border-slate-700">
+              <button type="button" data-deck-mode="grid" class="deck-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950">
+                🧊 3D Tilt
+              </button>
+              <button type="button" data-deck-mode="coverflow" class="deck-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold text-slate-300 hover:text-white">
+                🎠 3D Coverflow
+              </button>
+              <button type="button" data-deck-mode="isometric" class="deck-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold text-slate-300 hover:text-white">
+                📐 3D Iso Deck
+              </button>
+            </div>
+
+            <div class="relative flex-1 sm:w-56">
+              <input id="scheme-search-input" type="text" placeholder="योजना, स्कॉलरशिप या नौकरी खोजें..." class="w-full pl-3.5 pr-8 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400">
+            </div>
+
+            <label class="inline-flex items-center gap-1.5 text-xs text-rose-300 bg-rose-950/60 border border-rose-500/40 px-3 py-2 rounded-xl cursor-pointer shrink-0 font-semibold">
+              <input id="urgent-only-checkbox" type="checkbox" class="rounded accent-rose-500">
+              <span>⏳ जल्द बंद होने वाले</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D SPATIAL CARDS GRID -->
+      <div id="schemes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- GAURAV AI COPILOT & FOUNDER SHOWCASE BAR ON HOME -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Interactive Gaurav AI Sarkari Copilot -->
+        <div class="lg:col-span-7 glass-panel rounded-3xl p-6 border border-cyan-400/40 space-y-4">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center text-lg font-black text-slate-950 shadow-lg shadow-cyan-500/30">
+                🤖
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-extrabold text-white">Gaurav AI सरकारी सहायक (24×7 Live Copilot)</h3>
+                <p class="text-xs text-cyan-300">कोई भी सवाल पूछें या नीचे दिए बटन दबाएं — तुरंत जवाब पाएं!</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">● AI Online</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-ai-q="12वीं पास छात्रों के लिए सबसे अच्छी योजना और स्कॉलरशिप कौन सी है?" class="ai-chip-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/30 text-xs text-cyan-200 font-semibold">
+              🎓 12वीं पास के लिए योजनाएं?
+            </button>
+            <button type="button" data-ai-q="बिहार उद्यमी योजना में ₹10 लाख कैसे मिलता है और क्या कागज़ात लगते हैं?" class="ai-chip-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/30 text-xs text-cyan-200 font-semibold">
+              🏛️ ₹10 लाख उद्यमी योजना?
+            </button>
+            <button type="button" data-ai-q="सरकारी फॉर्म भरने के लिए फोटो और सिग्नेचर का साइज क्या होना चाहिए?" class="ai-chip-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/30 text-xs text-cyan-200 font-semibold">
+              📸 फोटो/सिग्नेचर साइज नियम?
+            </button>
+            <button type="button" data-ai-q="जाति, आय और निवास प्रमाण पत्र (RTPS) घर बैठे कैसे बनवाएं?" class="ai-chip-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/30 text-xs text-cyan-200 font-semibold">
+              📄 जाति/आय/निवास प्रमाण पत्र?
+            </button>
+          </div>
+
+          <div id="ai-chat-history" class="h-44 overflow-y-auto p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3 text-xs sm:text-sm">
+            <div class="p-3 rounded-2xl bg-indigo-950/70 border border-indigo-500/30 text-slate-100">
+              👋 <strong>नमस्ते! मैं गौरव दुबे (Gaurav Dubey) द्वारा प्रोग्राम किया गया AI सरकारी सहायक हूँ।</strong> आप मुझसे बिहार/केंद्र की किसी भी योजना, स्कॉलरशिप, सरकारी नौकरी या फॉर्म भरने के कागज़ात के बारे में पूछ सकते हैं!
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <input id="ai-chat-input" type="text" placeholder="यहाँ अपना सवाल लिखें (उदा. स्नातक पास लड़की के लिए ₹50,000 कैसे मिलेगा?)..." class="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400">
+            <button id="ai-chat-send-btn" type="button" class="btn-3d px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-extrabold text-xs sm:text-sm">
+              पूछें 🚀
+            </button>
+          </div>
+        </div>
+
+        <!-- Founder & Architect Showcase Card (Gaurav Dubey) -->
+        <div class="lg:col-span-5 card-3d glass-panel rounded-3xl p-6 border border-amber-400/50 flex flex-col justify-between gap-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50">
+                👑 Founder & Lead Architect
+              </span>
+              <span class="text-xs font-mono text-cyan-400">v4.0 Spatial SaaS</span>
+            </div>
+            <div class="flex items-center gap-4 pt-1">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-indigo-600 p-0.5 shadow-xl shadow-amber-500/25 shrink-0">
+                <div class="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-2xl font-black text-amber-300">
+                  GD
+                </div>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-black text-white">Gaurav Dubey</h3>
+                <p class="text-xs sm:text-sm text-amber-300 font-semibold">Founder & Full-Stack 3D SaaS Developer</p>
+                <p class="text-xs text-slate-400 mt-0.5">Mission: हर छात्र, किसान और युवा तक सरल डिजिटल सेवा पहुँचाना</p>
+              </div>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
+              इस पोर्टल में जोड़े गए <strong>World-Class SaaS Tools</strong> इसे किसी भी सामान्य सरकारी वेबसाइट से 100 गुना आगे रखते हैं:
+            </p>
+            <ul class="text-xs text-slate-200 space-y-1.5">
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> <span><strong>इन-ब्राउज़र फोटो/सिग्नेचर स्टैम्प स्टूडियो:</strong> बिना किसी ऐप के 20KB–50KB परीक्षा फोटो बनाएं।</span></li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> <span><strong>लाइव एप्लिकेशन स्टेटस रडार:</strong> टोकन नंबर से फॉर्म का लाइव स्टेटस ट्रैक करें।</span></li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> <span><strong>100% ऑटोमेटेड AI + Telegram इंजन:</strong> बिना सर्वर खर्च के 24×7 अपडेट्स।</span></li>
+            </ul>
+          </div>
+          <button id="founder-open-tools-btn" type="button" class="btn-amber-3d w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-xs sm:text-sm">
+            🛠️ गौरव दुबे के 3D SaaS टूल्स अभी इस्तेमाल करें →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PAGE 2: WORLD-CLASS GOVTECH SAAS TOOLS     -->
+    <!-- ========================================== -->
+    <section id="page-saastools" class="hidden space-y-8">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-400/40 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+              📸 World-Class GovTech SaaS Tool #1 • By Gaurav Dubey
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">
+              लाइव सरकारी फॉर्म फोटो एवं सिग्नेचर रीसाइज़र (Name & Date Stamp के साथ)
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+              SSC, BPSC, रेलवे और स्कॉलरशिप फॉर्म में फोटो पर नाम और तारीख लिखना व साइज 20KB–50KB करना सबसे बड़ी समस्या होती है। इसे यहाँ 5 सेकंड में मुफ्त बनाएं!
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-7 space-y-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="photo-upload-input" class="block text-xs font-bold text-cyan-300 mb-1.5">1. अपनी फोटो या सिग्नेचर चुनें (Optional)</label>
+                <input id="photo-upload-input" type="file" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer">
+              </div>
+              <div>
+                <label for="photo-preset-select" class="block text-xs font-bold text-cyan-300 mb-1.5">2. परीक्षा प्रीसेट चुनें (Exam Size Preset)</label>
+                <select id="photo-preset-select" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+                  <option value="passport">पासपोर्ट फोटो (3.5cm × 4.5cm • 20–50 KB)</option>
+                  <option value="ssc">SSC / Railway फोटो (Name + Date पट्टी सहित)</option>
+                  <option value="signature">सिग्नेचर बॉक्स (140 × 60 px • 10–20 KB)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="stamp-name-input" class="block text-xs font-bold text-slate-300 mb-1">फोटो पर छपने वाला नाम (Name on Photo)</label>
+                <input id="stamp-name-input" type="text" value="GAURAV DUBEY" placeholder="उदा. RAHUL KUMAR" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+              </div>
+              <div>
+                <label for="stamp-date-input" class="block text-xs font-bold text-slate-300 mb-1">फोटो लेने की तारीख (DOP Stamp)</label>
+                <input id="stamp-date-input" type="text" value="DOP: 24-10-2026" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <label class="inline-flex items-center gap-2 text-xs sm:text-sm text-emerald-300 font-semibold cursor-pointer">
+                <input id="stamp-toggle-check" type="checkbox" checked class="accent-emerald-500 w-4 h-4">
+                <span>फोटो के नीचे सफेद पट्टी पर नाम और तारीख जोड़ें</span>
+              </label>
+              <div class="flex gap-2">
+                <button id="render-photo-stamp-btn" type="button" class="btn-3d px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-extrabold text-xs">
+                  🔄 प्रीव्यू अपडेट करें
+                </button>
+                <button id="download-stamped-photo-btn" type="button" class="btn-emerald-3d px-4 py-2.5 rounded-xl bg-emerald-500 text-white font-extrabold text-xs">
+                  ⬇️ Exam-Ready फोटो डाउनलोड करें
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-950/90 border border-cyan-500/30 space-y-3">
+            <span class="text-xs font-bold text-cyan-300">✨ लाइव सरकारी परीक्षा फोटो प्रीव्यू (350×450 px)</span>
+            <canvas id="sarkari-photo-canvas" width="280" height="360" class="rounded-xl border-2 border-slate-700 shadow-2xl bg-white"></canvas>
+            <span id="photo-kb-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              ✅ Estimated Size: ~34 KB (100% Valid for SSC/BPSC/PMS)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-panel rounded-3xl p-6 border border-emerald-500/40 space-y-4">
+          <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            📡 SaaS Tool #2 • Live Token Radar
+          </span>
+          <h3 class="text-xl font-black text-white">लाइव फॉर्म स्टेटस एवं टोकन ट्रैकर</h3>
+          <p class="text-xs text-slate-300">
+            अपना बुकिंग टोकन नंबर (जैसे <code>SK-2026-841</code>) डालकर देखें कि आपके फॉर्म की प्रक्रिया कहाँ तक पहुँची है:
+          </p>
+          <div class="flex gap-2">
+            <input id="track-token-input" type="text" value="SK-2026-841" class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white font-mono">
+            <button id="track-token-btn" type="button" class="btn-emerald-3d px-4 py-2.5 rounded-xl bg-emerald-500 text-white font-extrabold text-xs">
+              🔍 ट्रैक करें
+            </button>
+          </div>
+          <div id="tracker-steps-box" class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between text-emerald-400 font-bold">
+              <span>1. ✅ आवेदक विवरण एवं टोकन जनरेटेड</span>
+              <span>पूर्ण</span>
+            </div>
+            <div class="flex items-center justify-between text-emerald-400 font-bold">
+              <span>2. ✅ AI डॉक्यूमेंट साइज एवं पात्रता जांच</span>
+              <span>पूर्ण</span>
+            </div>
+            <div class="flex items-center justify-between text-cyan-300 font-bold animate-pulse">
+              <span>3. ⏳ आधिकारिक सरकारी पोर्टल पर फॉर्म सबमिशन</span>
+              <span>प्रक्रिया में (In Progress)</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-400">
+              <span>4. ⭕ फाइनल पावती (Receipt PDF) WhatsApp डिलीवरी</span>
+              <span>अगला चरण</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-6 border border-indigo-500/40 space-y-4">
+          <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+            ⚖️ SaaS Tool #3 • Scheme Comparator
+          </span>
+          <h3 class="text-xl font-black text-white">2 सरकारी योजनाओं की सीधी तुलना करें</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <select id="cmp-scheme-a" aria-label="Scheme A" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"></select>
+            <select id="cmp-scheme-b" aria-label="Scheme B" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"></select>
+          </div>
+          <div id="cmp-result-box" class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PAGE 3: AI ELIGIBILITY CHECKER             -->
+    <!-- ========================================== -->
+    <section id="page-eligibility" class="hidden space-y-6">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-indigo-500/30">
+        <div class="max-w-3xl space-y-2 mb-6">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+            🎯 AI Eligibility Engine • Engineered by Gaurav Dubey
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+            10 सेकंड में जानें आप किन-किन सरकारी योजनाओं और नौकरियों के पात्र हैं
+          </h2>
+          <p class="text-sm text-slate-300">
+            नीचे अपनी बेसिक जानकारी चुनें—हमारा स्मार्ट इंजन तुरंत आपके लिए उपलब्ध योजनाओं, स्कॉलरशिप और फॉर्म की लिस्ट निकाल देगा।
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+          <div>
+            <label for="elig-age" class="block text-xs font-bold text-slate-300 mb-1.5">आपकी उम्र (वर्ष में)</label>
+            <input id="elig-age" type="number" min="14" max="70" value="21" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:border-cyan-400 focus:outline-none">
+          </div>
+          <div>
+            <label for="elig-edu" class="block text-xs font-bold text-slate-300 mb-1.5">शिक्षा (Qualification)</label>
+            <select id="elig-edu" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:border-cyan-400 focus:outline-none">
+              <option value="all">सभी / कोई भी</option>
+              <option value="10th">10वीं पास (Matric)</option>
+              <option value="12th" selected>12वीं पास (Inter / ITI)</option>
+              <option value="graduate">स्नातक (Graduate / Post Grad)</option>
+              <option value="farmer">किसान / कारीगर / स्वरोज़गार</option>
+            </select>
+          </div>
+          <div>
+            <label for="elig-cat" class="block text-xs font-bold text-slate-300 mb-1.5">कैटेगरी (Category)</label>
+            <select id="elig-cat" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:border-cyan-400 focus:outline-none">
+              <option value="all">सभी वर्ग (General / OBC / SC / ST)</option>
+              <option value="obc" selected>BC / EBC / OBC</option>
+              <option value="scst">SC / ST</option>
+              <option value="general">General / EWS</option>
+            </select>
+          </div>
+          <div>
+            <label for="elig-income" class="block text-xs font-bold text-slate-300 mb-1.5">वार्षिक पारिवारिक आय</label>
+            <select id="elig-income" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:border-cyan-400 focus:outline-none">
+              <option value="under3" selected>₹3 लाख से कम</option>
+              <option value="under8">₹3 लाख से ₹8 लाख</option>
+              <option value="above8">₹8 लाख से अधिक</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <button id="run-elig-check-btn" type="button" class="btn-3d px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-extrabold text-sm sm:text-base">
+            🔍 मेरी पात्रता की जांच करें (Check Now)
+          </button>
+          <span id="elig-result-summary" class="text-sm font-semibold text-emerald-400"></span>
+        </div>
+
+        <div id="elig-results-grid" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Populated by Eligibility Engine -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PAGE 4: PREMIUM FORM-FILLING SEVA          -->
+    <!-- ========================================== -->
+    <section id="page-formseva" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 border border-emerald-500/30 space-y-5">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              📝 प्रीमियम फॉर्म-फिलिंग और डॉक्यूमेंट सहायता
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+              घर बैठे एक्सपर्ट्स से अपना फॉर्म भरवाएं
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+              फोटो रिसाइज़िंग, सर्वर हैंग या गलत कैटेगरी भरने के डर से बचें। नीचे डिटेल्स भरें—हमारी टीम आपसे WhatsApp पर डॉक्यूमेंट लेकर फॉर्म सबमिट करेगी और पावती (Receipt PDF) भेजेगी।
+            </p>
+          </div>
+
+          <form id="expert-booking-form" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="book-name" class="block text-xs font-bold text-slate-300 mb-1">आवेदक का पूरा नाम *</label>
+                <input id="book-name" type="text" required placeholder="उदा. राहुल कुमार" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-emerald-400 focus:outline-none">
+              </div>
+              <div>
+                <label for="book-phone" class="block text-xs font-bold text-slate-300 mb-1">WhatsApp मोबाइल नंबर *</label>
+                <input id="book-phone" type="tel" required placeholder="10 अंकों का मोबाइल नंबर" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-emerald-400 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="book-scheme" class="block text-xs font-bold text-slate-300 mb-1">कौन-सा फॉर्म भरवाना है? *</label>
+                <select id="book-scheme" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-emerald-400 focus:outline-none">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div>
+                <label for="book-district" class="block text-xs font-bold text-slate-300 mb-1">आपका जिला / शहर</label>
+                <input id="book-district" type="text" value="पटना (बिहार)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-emerald-400 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+              <div class="text-xs font-bold text-cyan-300">📄 आपके पास अभी कौन-कौन से कागज़ात तैयार हैं? (टिक करें)</div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked class="doc-check accent-emerald-500" value="आधार कार्ड"> आधार कार्ड
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked class="doc-check accent-emerald-500" value="पासपोर्ट फोटो"> पासपोर्ट फोटो
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked class="doc-check accent-emerald-500" value="बैंक पासबुक"> बैंक पासबुक
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="doc-check accent-emerald-500" value="आय प्रमाण पत्र"> आय प्रमाण पत्र
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="doc-check accent-emerald-500" value="जाति प्रमाण पत्र"> जाति प्रमाण पत्र
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="doc-check accent-emerald-500" value="निवास प्रमाण पत्र"> निवास प्रमाण पत्र
+                </label>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 space-y-2.5">
+              <div class="text-xs font-bold text-indigo-300">⚡ अतिरिक्त प्रीमियम सुविधाएं (Optional Add-ons):</div>
+              <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer p-2 rounded-xl hover:bg-slate-900/60">
+                <span class="flex items-center gap-2">
+                  <input id="addon-cert" type="checkbox" class="accent-cyan-400">
+                  <span>जाति / आय / निवास प्रमाण पत्र (RTPS) ऑनलाइन आवेदन सहायता</span>
+                </span>
+                <span class="font-bold text-cyan-300">+₹30</span>
+              </label>
+              <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer p-2 rounded-xl hover:bg-slate-900/60">
+                <span class="flex items-center gap-2">
+                  <input id="addon-alert" type="checkbox" checked class="accent-cyan-400">
+                  <span>Admit Card, Status व Result का व्यक्तिगत WhatsApp अलर्ट</span>
+                </span>
+                <span class="font-bold text-cyan-300">+₹10</span>
+              </label>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40">
+              <div>
+                <div class="text-xs text-emerald-300">कुल पोर्टल सेवा शुल्क (सरकारी फीस के अतिरिक्त):</div>
+                <div class="text-2xl font-extrabold text-white" id="total-service-fee-display">₹60</div>
+              </div>
+              <button type="submit" class="btn-emerald-3d px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-sm sm:text-base">
+                ✅ बुकिंग कन्फर्म करें और टोकन पाएं
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="lg:col-span-5 space-y-6">
+          <div id="booking-receipt-card" class="glass-panel rounded-3xl p-6 border border-cyan-500/40 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span class="text-xs font-bold text-cyan-400 uppercase">Digital Form Seva Token</span>
+                <h3 class="text-lg font-extrabold text-white" id="receipt-token-id">TOKEN #SK-2026-841</h3>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" id="receipt-status-badge">
+                Ready to Book
+              </span>
+            </div>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300" id="receipt-details-box">
+              <p>👉 बाईं तरफ अपना नाम, मोबाइल नंबर और फॉर्म चुनकर <strong>बुकिंग कन्फर्म करें</strong> दबाएं।</p>
+              <p>👉 बुकिंग होते ही आपको एक <strong>यूनिक टोकन नंबर</strong> और WhatsApp/Telegram डायरेक्ट लिंक मिलेगा।</p>
+            </div>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <a id="receipt-whatsapp-send" href="https://wa.me/919999999999?text=Namaste%20Sarkari%20Seva%20Portal%2C%20mujhe%20form%20bharwana%20hai" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all">
+                📲 WhatsApp पर डॉक्यूमेंट भेजें
+              </a>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-3xl p-6 border border-amber-500/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base sm:text-lg font-extrabold text-amber-300">💰 आपकी कमाई का कैलकुलेटर (Gaurav Dubey SaaS)</h3>
+              <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-200">Zero Budget Model</span>
+            </div>
+            <p class="text-xs text-slate-300">
+              अगर आपके चैनल पर रोज़ 1,000 लोग पोस्ट देखते हैं और उनमें से सिर्फ <strong>15 से 30 लोग</strong> भी आपसे फॉर्म भरवाते हैं:
+            </p>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs font-bold mb-1">
+                  <span>प्रतिदिन फॉर्म बुकिंग: <span id="calc-forms-label" class="text-cyan-300">20 फॉर्म/दिन</span></span>
+                  <span>औसत मुनाफा: ₹60/फॉर्म</span>
+                </div>
+                <input id="calc-forms-slider" type="range" min="5" max="100" value="20" class="w-full accent-amber-400 cursor-pointer">
+              </div>
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-xs text-slate-400">रोज़ की कमाई</div>
+                  <div class="text-lg font-extrabold text-emerald-400" id="calc-daily-income">₹1,200 / दिन</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-xs text-slate-400">महीने की कमाई</div>
+                  <div class="text-lg font-extrabold text-amber-400" id="calc-monthly-income">₹36,000 / महीना</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PAGE 5: ALL OFFICIAL LINKS & CHANNELS HUB  -->
+    <!-- ========================================== -->
+    <section id="page-links" class="hidden space-y-6">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+            🔗 Verified Official Government Portals
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+            सभी महत्वपूर्ण सरकारी वेबसाइट्स और आपके सोशल चैनल लिंक्स
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300">
+            यहाँ से सीधे आधिकारिक पोर्टल खोलें या नीचे अपने खुद के WhatsApp, Telegram और Instagram लिंक अपडेट करें।
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-indigo-500/40 space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-indigo-300">
+            ⚙️ अपने पोर्टल के सोशल मीडिया और फॉर्म लिंक यहाँ सेट करें (1-Click Live Update):
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label for="cfg-whatsapp" class="block text-xs text-slate-400 mb-1">आपका WhatsApp नंबर (91 के साथ)</label>
+              <input id="cfg-whatsapp" type="text" value="919876543210" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+            </div>
+            <div>
+              <label for="cfg-telegram" class="block text-xs text-slate-400 mb-1">आपका Telegram Channel लिंक</label>
+              <input id="cfg-telegram" type="text" value="https://t.me/SarkariSevaPortal" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+            </div>
+            <div>
+              <label for="cfg-insta" class="block text-xs text-slate-400 mb-1">आपका Instagram Page लिंक</label>
+              <input id="cfg-insta" type="text" value="https://instagram.com/sarkarisevaportal" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs sm:text-sm text-white">
+            </div>
+          </div>
+          <button id="save-channel-links-btn" type="button" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition-all">
+            💾 पोर्टल पर मेरे लिंक्स सेव करें
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="official-links-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PAGE 6: 100% FREE AUTOMATION & CODE HUB    -->
+    <!-- ========================================== -->
+    <section id="page-automation" class="hidden space-y-6">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-amber-500/40 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold">
+          <span>🤖 Zero-to-Hero: 100% Lifetime Free Automation Blueprint • By Gaurav Dubey</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          बिना कोडिंग जाने 15 मिनट में अपना ऑटोमेशन चालू करें (कहाँ क्या क्लिक करना है — पूरी गाइड)
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          आपको एक भी लाइन का कोड खुद से नहीं लिखना है! नीचे हमने <strong>6 आसान स्टेप्स की टिक-लिस्ट</strong>, <strong>मास्टर AI प्रॉम्प्ट</strong>, <strong>लाइव AI पोस्टर जनरेटर</strong> और <strong>पूरा Python + GitHub Actions कोड</strong> तैयार कर दिया है।
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300">STEP 1 (3 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 1 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">Telegram पर चैनल और बॉट बनाएं</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. Telegram में एक <strong>Public Channel</strong> बनाएं (जैसे <code>@BiharYojanaAlert</code>)।<br>
+              2. Telegram में <strong>@BotFather</strong> सर्च करें, उसे <code>/newbot</code> भेजें और नाम देकर अपना <strong>API Token</strong> कॉपी कर लें।<br>
+              3. उस बॉट को अपने चैनल में <strong>Admin</strong> बना दें।
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300">STEP 2 (2 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 2 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">मुफ्त Gemini AI Key लें</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. ब्राउज़र में <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline">aistudio.google.com/app/apikey</a> खोलें।<br>
+              2. अपने Gmail से लॉगिन करें और नीले <strong>Create API Key</strong> बटन पर क्लिक करें।<br>
+              3. जो Key मिले उसे कॉपी करके नोट कर लें (यह 100% फ्री है)।
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300">STEP 3 (3 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 3 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">GitHub पर मुफ्त अकाउंट बनाएं</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline">github.com</a> पर जाकर फ्री साइन-अप करें।<br>
+              2. ऊपर <strong>+ (Plus)</strong> आइकॉन दबाकर <strong>New repository</strong> चुनें।<br>
+              3. नाम लिखें <code>sarkari-portal</code>, उसे <strong>Public</strong> रखें और <strong>Create repository</strong> दबाएं।
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300">STEP 4 (3 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 4 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">फाइलें GitHub में अपलोड करें</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. हमने जो <strong>ZIP फाइल</strong> दी है, उसे फोन/पीसी में अनज़िप करें।<br>
+              2. GitHub पर <strong>uploading an existing file</strong> क्लिक करें और सारी फाइलें डालकर <strong>Commit changes</strong> दबाएं।<br>
+              3. इस 3D वेबसाइट को <code>index.html</code> नाम से डालें।
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-pink-500/20 text-pink-300">STEP 5 (2 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 5 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">GitHub Secrets में चाबी (Keys) डालें</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. GitHub Repo के <strong>Settings → Secrets and variables → Actions</strong> में जाएं।<br>
+              2. <strong>New repository secret</strong> दबाकर ये 3 नाम और उनकी वैल्यू डालें:<br>
+              <code>GEMINI_API_KEY</code>, <code>TELEGRAM_BOT_TOKEN</code>, और <code>TELEGRAM_CHAT_ID</code>।
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300">STEP 6 (2 मिनट)</span>
+              <input type="checkbox" class="step-check w-4 h-4 accent-emerald-500 cursor-pointer" aria-label="Step 6 Completed">
+            </div>
+            <h3 class="font-bold text-white text-sm">Actions और 3D वेबसाइट लाइव करें</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              1. GitHub में ऊपर <strong>Actions</strong> टैब पर जाएं और <strong>Run workflow</strong> दबाएं—पहला पोस्ट तुरंत आपके Telegram पर आ जाएगा!<br>
+              2. <strong>Settings → Pages → Branch: main</strong> सेव करें—आपकी 3D वेबसाइट भी मुफ्त में लाइव हो जाएगी!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE AI POST & POSTER GENERATOR SIMULATOR -->
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold text-cyan-400 uppercase">Live Automation Simulator & Poster Studio</span>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white">
+              🎨 लाइव टेस्ट करें: सरकारी नोटिस से ऑटोमैटिक हिंदी पोस्ट और Instagram पोस्टर बनाएं
+            </h3>
+          </div>
+          <button id="sim-generate-btn" type="button" class="btn-3d px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-extrabold text-xs sm:text-sm shrink-0">
+            ⚡ नया पोस्ट और पोस्टर जनरेट करें
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-6 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300">1. AI द्वारा तैयार Telegram / WhatsApp पोस्ट:</span>
+              <button id="copy-sim-post-btn" type="button" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold border border-cyan-500/30">
+                📋 पोस्ट कॉपी करें
+              </button>
+            </div>
+            <textarea id="sim-post-output" rows="12" readonly class="w-full p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-200 font-mono leading-relaxed focus:outline-none"></textarea>
+          </div>
+
+          <div class="lg:col-span-6 space-y-3 flex flex-col items-center">
+            <div class="w-full flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300">2. ऑटो-जनरेटेड Instagram / WhatsApp पोस्टर:</span>
+              <button id="download-poster-btn" type="button" class="px-3 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold border border-emerald-500/40">
+                ⬇️ पोस्टर डाउनलोड करें (PNG)
+              </button>
+            </div>
+            <canvas id="poster-canvas" width="600" height="380" class="w-full max-w-md rounded-2xl border border-slate-700 shadow-lg"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASTER PROMPT & CODE COPY-PASTE BLOCKS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-panel rounded-3xl p-6 border border-indigo-500/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base sm:text-lg font-extrabold text-indigo-300">🧠 1. प्रोफेशनल Master AI Prompt</h3>
+            <button id="copy-prompt-btn" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold">
+              📋 Prompt कॉपी करें
+            </button>
+          </div>
+          <pre id="master-prompt-code" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-cyan-200 overflow-x-auto whitespace-pre-wrap max-h-80">तुम 'सरकारी सेवा और फॉर्म अलर्ट पोर्टल' (by Gaurav Dubey) के मुख्य एडिटर हो।
+नीचे दी गई सरकारी योजना, स्कॉलरशिप या भर्ती की सूचना को पढ़कर बिल्कुल सरल, सटीक और आकर्षक हिंदी में एक पोस्ट तैयार करो।
+
+पोस्ट का फॉर्मेट बिल्कुल ऐसा रखो:
+📢 *[योजना / भर्ती / स्कॉलरशिप का स्पष्ट नाम]*
+
+✅ *किसके लिए है (पात्रता):* [उम्र, शिक्षा और राज्य सरल शब्दों में]
+🎁 *मुख्य लाभ / कुल पद:* [कितने पैसे मिलेंगे या कितनी सीटें हैं]
+📄 *ज़रूरी कागज़ात:* आधार कार्ड, मोबाइल नंबर, पासपोर्ट फोटो, आय/जाति/निवास प्रमाण पत्र, बैंक पासबुक
+⏳ *अंतिम तिथि:* [तारीख लिखें या 'जल्द आवेदन करें']
+
+💡 *घर बैठे बिना गलती फॉर्म भरवाएं:*
+क्या आपको खुद फॉर्म भरने या फोटो/दस्तावेज़ अपलोड करने में दिक्कत हो रही है? हमारे एक्सपर्ट्स से मात्र ₹50 सेवा शुल्क में घर बैठे अपना फॉर्म भरवाएं!
+👉 फॉर्म बुक करने का लिंक: [आपका पोर्टल / WhatsApp लिंक]
+
+#SarkariYojana #BiharYojana #Scholarship #SarkariNaukri #GauravDubey</pre>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-6 border border-emerald-500/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base sm:text-lg font-extrabold text-emerald-300">🐍 2. Python ऑटोमेशन कोड (sarkari_bot.py)</h3>
+            <button id="copy-python-btn" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+              📋 Python कोड कॉपी करें
+            </button>
+          </div>
+          <pre id="python-script-code" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-emerald-200 overflow-x-auto max-h-80">import os, json, time, feedparser, requests
+from bs4 import BeautifulSoup
+import google.generativeai as genai
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+FORM_BOOKING_URL = os.environ.get("FORM_BOOKING_URL", "https://t.me/YourBot")
+
+RSS_FEEDS = [
+    "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=3",
+    "https://news.google.com/rss/search?q=Bihar+Sarkari+Yojana+Scholarship+Form&hl=hi&gl=IN&ceid=IN:hi"
+]
+
+def summarize_with_gemini(title, summary, link):
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = f"सरल हिंदी में सरकारी योजना/फॉर्म अलर्ट पोस्ट बनाएं:\nशीर्षक: {title}\nविवरण: {summary}"
+    return model.generate_content(prompt).text.strip()
+
+def send_to_telegram(text, source_link):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    buttons = {"inline_keyboard": [
+        [{"text": "📝 घर बैठे फॉर्म भरवाएं (₹50)", "url": FORM_BOOKING_URL}],
+        [{"text": "🔗 आधिकारिक लिंक", "url": source_link}]
+    ]}
+    requests.post(url, data={
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": text,
+        "reply_markup": json.dumps(buttons)
+    }, timeout=20)</pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SCHEME DETAILS & QUICK BOOKING MODAL -->
+  <div id="scheme-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-xl w-full p-6 sm:p-7 border border-cyan-500/40 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <span id="modal-category-badge" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300">योजना</span>
+          <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-white mt-1">योजना का नाम</h3>
+        </div>
+        <button id="close-modal-btn" type="button" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+      <p id="modal-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+      <div class="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs">
+        <div>
+          <span class="text-slate-400 block">🎁 मुख्य लाभ / पद:</span>
+          <strong id="modal-benefit" class="text-emerald-400 text-sm"></strong>
+        </div>
+        <div>
+          <span class="text-slate-400 block">⏳ अंतिम तिथि / स्थिति:</span>
+          <strong id="modal-deadline" class="text-amber-300 text-sm"></strong>
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <div class="text-xs font-bold text-cyan-300">📄 आवेदन के लिए ज़रूरी कागज़ात:</div>
+        <ul id="modal-docs-list" class="list-disc list-inside text-xs sm:text-sm text-slate-200 space-y-1"></ul>
+      </div>
+      <div class="pt-3 flex flex-wrap items-center gap-3">
+        <button id="modal-book-btn" type="button" class="flex-1 btn-emerald-3d py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs sm:text-sm">
+          📝 ₹50 में घर बैठे यह फॉर्म भरवाएं
+        </button>
+        <a id="modal-official-link" href="https://myscheme.gov.in" target="_blank" rel="noopener noreferrer" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 font-bold text-xs sm:text-sm">
+          🔗 आधिकारिक वेबसाइट
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden px-4 py-3 rounded-2xl bg-slate-900/95 border border-cyan-400/50 text-white text-xs sm:text-sm font-semibold shadow-2xl flex items-center gap-2">
+    <span id="toast-text">सफलतापूर्वक सेव किया गया!</span>
+  </div>
+
+  <!-- FOOTER WITH GAURAV DUBEY DEVELOPER SIGNATURE -->
+  <footer class="relative z-20 border-t border-cyan-500/20 py-7 px-4 mt-12 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="space-y-1 text-center sm:text-left">
+        <div>
+          <strong class="text-white text-sm">जन-सेवा 3D SaaS पोर्टल (Sarkari Seva AI Hub)</strong> — Designed & Engineered by <strong class="text-amber-300">Gaurav Dubey</strong>
+        </div>
+        <p class="text-[11px] text-slate-400">छात्रों, किसानों और युवाओं के लिए भारत का पहला 3D WebGL सरकारी योजना, फोटो SaaS एवं फॉर्म सहायता केंद्र।</p>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <button type="button" data-page="home" class="footer-nav-link hover:text-cyan-400 font-semibold">होम</button>
+        <button type="button" data-page="saastools" class="footer-nav-link hover:text-cyan-400 font-semibold">SaaS टूल्स</button>
+        <button type="button" data-page="eligibility" class="footer-nav-link hover:text-cyan-400 font-semibold">पात्रता चेकर</button>
+        <button type="button" data-page="formseva" class="footer-nav-link hover:text-cyan-400 font-semibold">फॉर्म सेवा</button>
+        <button type="button" data-page="automation" class="footer-nav-link hover:text-amber-300 font-semibold">ऑटोमेशन कोड</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    const SCHEMES_DATA = [
+      {
+        id: "bihar-udyam",
+        title: "बिहार मुख्यमंत्री उद्यमी योजना 2026",
+        category: "yojana",
+        catLabel: "🏛️ बिहार सरकारी योजना",
+        benefit: "₹10 लाख तक (₹5 लाख माफ़ / 50% अनुदान)",
+        deadline: "आवेदन सक्रिय / वार्षिक पोर्टल",
+        urgent: true,
+        minAge: 18,
+        maxAge: 50,
+        edu: ["12th", "graduate", "farmer"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8"],
+        summary: "बिहार के युवाओं, महिलाओं और सभी वर्गों को नया उद्योग या स्टार्टअप शुरू करने के लिए सरकार ₹10 लाख तक देती है, जिसमें ₹5 लाख सब्सिडी है।",
+        docs: ["आधार कार्ड और पैन कार्ड", "12वीं / इंटर या ITI पास मार्कशीट", "जाति, आय और बिहार निवास प्रमाण पत्र", "चालू बैंक खाता (Current Account) व फोटो"],
+        officialUrl: "https://udyami.bihar.gov.in/"
+      },
+      {
+        id: "bihar-pms",
+        title: "बिहार पोस्ट मैट्रिक स्कॉलरशिप (PMS)",
+        category: "scholarship",
+        catLabel: "🎓 बिहार स्कॉलरशिप",
+        benefit: "₹2,000 से ₹15,000+ प्रति वर्ष",
+        deadline: "जल्द आवेदन करें (अंतिम तिथि नज़दीक)",
+        urgent: true,
+        minAge: 15,
+        maxAge: 35,
+        edu: ["12th", "graduate"],
+        caste: ["obc", "scst"],
+        income: ["under3"],
+        summary: "10वीं पास करने के बाद 11वीं, 12वीं, स्नातक, ITI, पॉलिटेक्निक या B.Ed कर रहे BC, EBC, SC और ST छात्रों के लिए सीधी बैंक खाते में छात्रवृत्ति।",
+        docs: ["आधार कार्ड और पिछली कक्षा की मार्कशीट", "कॉलेज बोनाफाइड और फीस रसीद (Bonafide Certificate)", "जाति, आय (₹3 लाख से कम) और निवास प्रमाण पत्र", "आधार सीडेड बैंक पासबुक"],
+        officialUrl: "https://pmsonline.bih.nic.in/"
+      },
+      {
+        id: "kanya-utthan",
+        title: "मुख्यमंत्री कन्या उत्थान योजना (12वीं / स्नातक पास)",
+        category: "scholarship",
+        catLabel: "🎓 छात्रा प्रोत्साहन राशि",
+        benefit: "₹25,000 (इंटर पास) / ₹50,000 (स्नातक पास)",
+        deadline: "मेधासॉफ्ट पोर्टल पर पंजीकरण जारी",
+        urgent: true,
+        minAge: 16,
+        maxAge: 32,
+        edu: ["12th", "graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8", "above8"],
+        summary: "बिहार से इंटर (12वीं) पास अविवाहित छात्राओं को ₹25,000 और मान्यता प्राप्त विश्वविद्यालय से स्नातक पास छात्राओं को ₹50,000 की प्रोत्साहन राशि।",
+        docs: ["12वीं या स्नातक की मूल मार्कशीट", "आधार कार्ड और चालू मोबाइल नंबर", "निवास प्रमाण पत्र और छात्रा के नाम का बैंक खाता", "पासपोर्ट साइज फोटो व ईमेल आईडी"],
+        officialUrl: "https://medhasoft.bih.nic.in/"
+      },
+      {
+        id: "bihar-student-credit",
+        title: "बिहार स्टूडेंट क्रेडिट कार्ड योजना (MNSSBY)",
+        category: "scholarship",
+        catLabel: "🎓 उच्च शिक्षा सहायता",
+        benefit: "₹4 लाख तक शिक्षा ऋण (मात्र 1% से 4% ब्याज)",
+        deadline: "पूरे वर्ष ऑनलाइन आवेदन खुला",
+        urgent: false,
+        minAge: 17,
+        maxAge: 25,
+        edu: ["12th", "graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8"],
+        summary: "12वीं पास छात्रों को B.Tech, B.Sc, BCA, MBA, पॉलिटेक्निक या नर्सिंग की आगे की पढ़ाई व लैपटॉप/हॉस्टल खर्च के लिए ₹4 लाख तक की सरकारी मदद।",
+        docs: ["10वीं और 12वीं की मार्कशीट", "उच्च शिक्षण संस्थान में दाखिले का प्रमाण (Admission Proof)", "आवेदक और अभिभावक का आधार कार्ड व फोटो", "निवास प्रमाण पत्र और बैंक पासबुक"],
+        officialUrl: "https://www.7nishchay-yuvaupmission.bihar.gov.in/"
+      },
+      {
+        id: "pm-vishwakarma",
+        title: "पीएम विश्वकर्मा योजना (PM Vishwakarma)",
+        category: "yojana",
+        catLabel: "🏛️ केंद्र सरकार योजना",
+        benefit: "₹15,000 टूलकिट वाउचर + ₹3 लाख सस्ता लोन",
+        deadline: "ऑनलाइन आवेदन चालू",
+        urgent: false,
+        minAge: 18,
+        maxAge: 65,
+        edu: ["all", "10th", "12th", "farmer"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8"],
+        summary: "18 पारंपरिक व्यवसायों (सिलाई/दर्जी, बढ़ई, राजमिस्त्री, नाई, सुनार, कुम्हार आदि) से जुड़े लोगों को ₹500/दिन ट्रेनिंग स्टाइपेंड और ₹15,000 टूलकिट सहायता।",
+        docs: ["आधार कार्ड और आधार से जुड़ा मोबाइल नंबर", "बैंक पासबुक और राशन कार्ड", "जाति प्रमाण पत्र (यदि लागू हो)", "पासपोर्ट फोटो"],
+        officialUrl: "https://pmvishwakarma.gov.in/"
+      },
+      {
+        id: "bpsc-cce",
+        title: "BPSC संयुक्त प्रतियोगी परीक्षा व शिक्षक/क्लर्क भर्ती",
+        category: "job",
+        catLabel: "💼 बिहार सरकारी नौकरी",
+        benefit: "अधिकारी एवं सहायक पद (वेतन ₹40,000–₹85,000+)",
+        deadline: "नवीनतम कैलेंडर जारी — जल्द आवेदन करें",
+        urgent: true,
+        minAge: 20,
+        maxAge: 40,
+        edu: ["graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8", "above8"],
+        summary: "बिहार लोक सेवा आयोग (BPSC) के तहत विभिन्न प्रशासनिक पदों, ब्लॉक अधिकारियों और शिक्षकों की भर्ती के लिए वन-टाइम रजिस्ट्रेशन (OTR) और ऑनलाइन फॉर्म।",
+        docs: ["मैट्रिक, इंटर और स्नातक प्रमाण पत्र", "बिहार निवास और जाति/NCL/EWS प्रमाण पत्र", "आधार कार्ड और लाइव वेबकैम फोटो", "हिंदी और अंग्रेजी हस्ताक्षर स्कैन"],
+        officialUrl: "https://bpsc.bih.nic.in/"
+      },
+      {
+        id: "ssc-chsl-mts",
+        title: "SSC CHSL / MTS एवं GD कांस्टेबल भर्ती 2026",
+        category: "job",
+        catLabel: "💼 केंद्र सरकार नौकरी",
+        benefit: "10,000+ संभावित पद (10वीं व 12वीं पास)",
+        deadline: "अंतिम तिथि से पहले OTR पूरा करें",
+        urgent: true,
+        minAge: 18,
+        maxAge: 27,
+        edu: ["10th", "12th", "graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8", "above8"],
+        summary: "कर्मचारी चयन आयोग (SSC) द्वारा 10वीं और 12वीं पास युवाओं के लिए केंद्रीय मंत्रालयों और सुरक्षा बलों में क्लर्क, डेटा एंट्री और एमटीएस पदों पर भर्ती।",
+        docs: ["10वीं / 12वीं का रोल नंबर और मार्कशीट", "आधार कार्ड", "केंद्रीय प्रारूप का OBC/SC/ST या EWS सर्टिफिकेट", "स्पष्ट हस्ताक्षर स्कैन"],
+        officialUrl: "https://ssc.gov.in/"
+      },
+      {
+        id: "pm-kisan",
+        title: "पीएम किसान सम्मान निधि योजना (PM-KISAN)",
+        category: "yojana",
+        catLabel: "🏛️ किसान कल्याण योजना",
+        benefit: "₹6,000 प्रति वर्ष (₹2,000 की 3 किस्तें)",
+        deadline: "e-KYC और नया किसान पंजीकरण चालू",
+        urgent: false,
+        minAge: 18,
+        maxAge: 70,
+        edu: ["all", "10th", "12th", "graduate", "farmer"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8"],
+        summary: "खेती योग्य भूमि वाले किसान परिवारों को हर साल ₹6,000 की सीधी आर्थिक सहायता। किस्त रुकने पर e-KYC और लैंड सीडिंग यहाँ से करवाएं।",
+        docs: ["आधार कार्ड", "जमीन की रसीद / LPC / खतियान विवरण", "एनपीसीआई (NPCI/DBT) से लिंक बैंक खाता", "मोबाइल नंबर"],
+        officialUrl: "https://pmkisan.gov.in/"
+      },
+      {
+        id: "nsp-scholarship",
+        title: "नेशनल स्कॉलरशिप पोर्टल (NSP Central Schemes)",
+        category: "scholarship",
+        catLabel: "🎓 नेशनल स्कॉलरशिप",
+        benefit: "₹12,000 से ₹50,000 प्रति वर्ष",
+        deadline: "OTR एवं फ्रेश/रिन्यूअल आवेदन शुरू",
+        urgent: true,
+        minAge: 14,
+        maxAge: 30,
+        edu: ["10th", "12th", "graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3"],
+        summary: "स्कूल और कॉलेज के मेधावी छात्रों (NMMS, Central Sector, AICTE Pragati/Saksham) के लिए केंद्र सरकार का एकीकृत छात्रवृत्ति पोर्टल।",
+        docs: ["आधार कार्ड और NSP फेस-ऑथेंटिकेशन (OTR)", "पिछली परीक्षा में 60%+ या 80%+ अंक की मार्कशीट", "आय प्रमाण पत्र और कॉलेज बोनाफाइड", "बैंक खाता विवरण"],
+        officialUrl: "https://scholarships.gov.in/"
+      },
+      {
+        id: "rrb-railway",
+        title: "भारतीय रेलवे (RRB NTPC / Group-D / ALP) भर्ती",
+        category: "job",
+        catLabel: "💼 रेलवे सरकारी नौकरी",
+        benefit: "स्टेशन मास्टर, क्लर्क, तकनीशियन व सहायक पद",
+        deadline: "वार्षिक रेलवे भर्ती कैलेंडर के अनुसार",
+        urgent: false,
+        minAge: 18,
+        maxAge: 33,
+        edu: ["10th", "12th", "graduate"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8", "above8"],
+        summary: "10वीं, ITI, 12वीं और स्नातक पास युवाओं के लिए रेलवे भर्ती बोर्ड (RRB पटना, मुजफ्फरपुर, रांची व अन्य जोन) में स्थायी सरकारी नौकरी।",
+        docs: ["10वीं / ITI / 12वीं / स्नातक प्रमाण पत्र", "सफेद बैकग्राउंड वाली रंगीन पासपोर्ट फोटो", "जाति / EWS प्रमाण पत्र और आधार कार्ड", "रिफंड के लिए स्वयं का बैंक खाता विवरण"],
+        officialUrl: "https://www.rrbpatna.gov.in/"
+      },
+      {
+        id: "ayushman-bharat",
+        title: "आयुष्मान भारत और मुख्यमंत्री जन आरोग्य कार्ड",
+        category: "yojana",
+        catLabel: "🏛️ स्वास्थ्य सुरक्षा योजना",
+        benefit: "₹5 लाख तक का मुफ्त इलाज प्रति वर्ष",
+        deadline: "तुरंत ऑनलाइन कार्ड बनाएं",
+        urgent: false,
+        minAge: 14,
+        maxAge: 70,
+        edu: ["all", "10th", "12th", "graduate", "farmer"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3"],
+        summary: "राशन कार्ड धारक परिवारों और 70 वर्ष से अधिक उम्र के सभी वरिष्ठ नागरिकों के लिए देश भर के सरकारी और प्राइवेट अस्पतालों में ₹5 लाख तक कैशलेस इलाज।",
+        docs: ["राशन कार्ड नंबर या पारिवारिक आईडी", "आधार कार्ड (ओटीपी के लिए लिंक मोबाइल नंबर)", "पासपोर्ट फोटो"],
+        officialUrl: "https://beneficiary.nha.gov.in/"
+      },
+      {
+        id: "bihar-rtps",
+        title: "RTPS बिहार: जाति, आय, निवास एवं NCL प्रमाण पत्र",
+        category: "yojana",
+        catLabel: "🏛️ ज़रूरी प्रमाण पत्र सेवा",
+        benefit: "किसी भी सरकारी फॉर्म व स्कॉलरशिप के लिए अनिवार्य",
+        deadline: "24×7 ऑनलाइन आवेदन उपलब्ध",
+        urgent: false,
+        minAge: 14,
+        maxAge: 70,
+        edu: ["all", "10th", "12th", "graduate", "farmer"],
+        caste: ["all", "obc", "scst", "general"],
+        income: ["under3", "under8", "above8"],
+        summary: "स्कॉलरशिप या सरकारी नौकरी का फॉर्म भरने से पहले नया जाति, आय, निवास या क्रीमीलेयर रहित (NCL/EWS) प्रमाण पत्र बिना ब्लॉक गए घर बैठे बनवाएं।",
+        docs: ["आवेदक का आधार कार्ड", "स्व-घोषणा पत्र (Self Declaration Form)", "पासपोर्ट साइज फोटो", "मोबाइल नंबर और ईमेल"],
+        officialUrl: "https://serviceonline.bihar.gov.in/"
+      }
+    ];
+
+    const OFFICIAL_PORTALS = [
+      { name: "MyScheme (सभी सरकारी योजनाएं)", desc: "केंद्र और राज्य सरकार की 2,000+ योजनाओं का आधिकारिक पोर्टल", url: "https://www.myscheme.gov.in/", badge: "National Portal" },
+      { name: "RTPS बिहार (Service Plus)", desc: "जाति, आय, निवास, NCL और राशन कार्ड ऑनलाइन आवेदन", url: "https://serviceonline.bihar.gov.in/", badge: "Bihar Govt" },
+      { name: "बिहार पोस्ट मैट्रिक स्कॉलरशिप", desc: "BC, EBC, SC, ST छात्रों के लिए छात्रवृत्ति पोर्टल", url: "https://pmsonline.bih.nic.in/", badge: "Scholarship" },
+      { name: "मेधासॉफ्ट बिहार (MedhaSoft)", desc: "कन्या उत्थान और मैट्रिक/इंटर प्रोत्साहन राशि पोर्टल", url: "https://medhasoft.bih.nic.in/", badge: "Scholarship" },
+      { name: "मुख्यमंत्री उद्यमी एवं स्टार्टअप बिहार", desc: "₹10 लाख युवा उद्यमी और स्टार्टअप सीड फंड पोर्टल", url: "https://udyami.bihar.gov.in/", badge: "Startup & Loan" },
+      { name: "BPSC आधिकारिक वेबसाइट", desc: "बिहार लोक सेवा आयोग की सभी भर्तियां और OTR", url: "https://bpsc.bih.nic.in/", badge: "Govt Jobs" },
+      { name: "SSC आधिकारिक पोर्टल", desc: "CHSL, MTS, CGL और GD कांस्टेबल ऑनलाइन फॉर्म", url: "https://ssc.gov.in/", badge: "Central Jobs" },
+      { name: "नेशनल करियर सर्विस (NCS)", desc: "सरकारी और प्राइवेट नौकरियों व कौशल प्रशिक्षण का पोर्टल", url: "https://www.ncs.gov.in/", badge: "Employment" },
+      { name: "पीएम किसान सम्मान निधि", desc: "₹6,000 वार्षिक किसान सहायता, e-KYC और स्टेटस चेक", url: "https://pmkisan.gov.in/", badge: "Agriculture" }
+    ];
+
+    let currentCategory = "all";
+    let savedSchemeIds = new Set(["bihar-udyam", "bihar-pms"]);
+    let customLinks = {
+      whatsapp: "919876543210",
+      telegram: "https://t.me/SarkariSevaPortal",
+      insta: "https://instagram.com/sarkarisevaportal"
+    };
+    let simIndex = 0;
+    let uploadedCandidateImg = null;
+
+    try {
+      const savedRaw = localStorage.getItem("sarkari_saved_ids");
+      if (savedRaw) savedSchemeIds = new Set(JSON.parse(savedRaw));
+      const linksRaw = localStorage.getItem("sarkari_custom_links");
+      if (linksRaw) customLinks = JSON.parse(linksRaw);
+    } catch (e) {}
+
+    function persistState() {
+      try {
+        localStorage.setItem("sarkari_saved_ids", JSON.stringify(Array.from(savedSchemeIds)));
+        localStorage.setItem("sarkari_custom_links", JSON.stringify(customLinks));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById("toast-box");
+      const txt = document.getElementById("toast-text");
+      if (!box || !txt) return;
+      txt.textContent = msg;
+      box.classList.remove("hidden");
+      setTimeout(() => {
+        box.classList.add("hidden");
+      }, 3200);
+    }
+
+    function copyTextSafe(text, label) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast("✅ " + label + " कॉपी हो गया!");
+          }).catch(() => fallbackCopy(text, label));
+        } else {
+          fallbackCopy(text, label);
+        }
+      } catch (e) {
+        fallbackCopy(text, label);
+      }
+    }
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast("✅ " + label + " कॉपी हो गया!");
+      } catch (err) {
+        showToast("ℹ️ कृपया टेक्स्ट को सेलेक्ट करके कॉपी करें");
+      }
+      document.body.removeChild(ta);
+    }
+
+    function switchPage(pageId) {
+      const pages = ["home", "saastools", "eligibility", "formseva", "links", "automation"];
+      pages.forEach(p => {
+        const el = document.getElementById("page-" + p);
+        if (el) {
+          if (p === pageId) el.classList.remove("hidden");
+          else el.classList.add("hidden");
+        }
+      });
+
+      document.querySelectorAll(".nav-tab-btn").forEach(btn => {
+        const target = btn.getAttribute("data-page");
+        if (target === pageId) {
+          btn.className = "nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20 shrink-0";
+        } else if (target === "automation") {
+          btn.className = "nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 shrink-0";
+        } else if (target === "saastools") {
+          btn.className = "nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 shrink-0";
+        } else {
+          btn.className = "nav-tab-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800/80 shrink-0";
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderSchemesGrid() {
+      const grid = document.getElementById("schemes-grid");
+      const searchVal = (document.getElementById("scheme-search-input")?.value || "").trim().toLowerCase();
+      const urgentOnly = document.getElementById("urgent-only-checkbox")?.checked || false;
+      const savedBadge = document.getElementById("saved-count-badge");
+      if (savedBadge) savedBadge.textContent = String(savedSchemeIds.size);
+
+      if (!grid) return;
+
+      const filtered = SCHEMES_DATA.filter(item => {
+        if (currentCategory === "saved" && !savedSchemeIds.has(item.id)) return false;
+        if (currentCategory !== "all" && currentCategory !== "saved" && item.category !== currentCategory) return false;
+        if (urgentOnly && !item.urgent) return false;
+        if (searchVal) {
+          const hay = (item.title + " " + item.summary + " " + item.benefit + " " + item.catLabel).toLowerCase();
+          if (!hay.includes(searchVal)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full glass-panel rounded-2xl p-8 text-center space-y-3">
+            <div class="text-3xl">🔍</div>
+            <h3 class="text-lg font-bold text-white">कोई योजना या फॉर्म नहीं मिला</h3>
+            <p class="text-xs text-slate-400">कृपया फिल्टर बदलें या सर्च बॉक्स साफ करें।</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const isSaved = savedSchemeIds.has(item.id);
+        const urgentBadge = item.urgent
+          ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/25 text-rose-300 border border-rose-500/50">⏳ जल्द आवेदन करें</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ सक्रिय</span>`;
+
+        return `
+          <article class="card-3d rounded-3xl p-5 flex flex-col justify-between gap-4">
+            <div class="space-y-3 layer-z-20">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold neon-badge text-cyan-300">${item.catLabel}</span>
+                <div class="flex items-center gap-1.5">
+                  ${urgentBadge}
+                  <button type="button" data-save-id="${item.id}" class="save-scheme-btn w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 flex items-center justify-center text-sm" title="सेव करें">
+                    ${isSaved ? "🔖" : "☆"}
+                  </button>
+                </div>
+              </div>
+
+              <h3 class="text-lg font-black text-white leading-snug drop-shadow">${item.title}</h3>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${item.summary}</p>
+
+              <div class="p-3.5 rounded-2xl bg-slate-950/90 border border-cyan-500/30 space-y-1.5 text-xs shadow-inner">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-slate-400">🎁 मुख्य लाभ:</span>
+                  <span class="font-extrabold text-emerald-400 text-right">${item.benefit}</span>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-slate-400">⏳ स्थिति:</span>
+                  <span class="font-semibold text-amber-300 text-right">${item.deadline}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1 layer-z-30">
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" data-book-id="${item.id}" class="quick-book-btn btn-emerald-3d py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs flex items-center justify-center gap-1">
+                  <span>📝 फॉर्म भरवाएं (₹50)</span>
+                </button>
+                <button type="button" data-detail-id="${item.id}" class="open-detail-btn py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 font-bold text-xs flex items-center justify-center gap-1">
+                  <span>📄 कागज़ात व लिंक</span>
+                </button>
+              </div>
+              <button type="button" data-speak-id="${item.id}" class="speak-scheme-btn w-full py-2 px-3 rounded-xl bg-indigo-950/70 hover:bg-indigo-900/70 border border-indigo-500/40 text-indigo-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+                <span>🔊 हिंदी ऑडियो में जानकारी सुनें (Voice Alert)</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      attachCardListeners();
+    }
+
+    function attachCardListeners() {
+      document.querySelectorAll(".card-3d").forEach(card => {
+        card.addEventListener("mousemove", e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty("--mouse-x", `${x}px`);
+          card.style.setProperty("--mouse-y", `${y}px`);
+          const rotateY = ((x / rect.width) - 0.5) * 14;
+          const rotateX = ((y / rect.height) - 0.5) * -14;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(12px)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "";
+        });
+      });
+
+      document.querySelectorAll(".save-scheme-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-save-id");
+          if (!id) return;
+          if (savedSchemeIds.has(id)) {
+            savedSchemeIds.delete(id);
+            showToast("जानकारी बुकमार्क से हटाई गई");
+          } else {
+            savedSchemeIds.add(id);
+            showToast("🔖 योजना आपके सेव फोल्डर में जुड़ गई!");
+          }
+          persistState();
+          renderSchemesGrid();
+        });
+      });
+
+      document.querySelectorAll(".quick-book-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-book-id");
+          const selectEl = document.getElementById("book-scheme");
+          if (selectEl && id) selectEl.value = id;
+          switchPage("formseva");
+          showToast("📝 कृपया अपना नाम और नंबर भरकर टोकन जनरेट करें");
+        });
+      });
+
+      document.querySelectorAll(".open-detail-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-detail-id");
+          openSchemeModal(id);
+        });
+      });
+
+      document.querySelectorAll(".speak-scheme-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-speak-id");
+          const item = SCHEMES_DATA.find(s => s.id === id);
+          if (!item) return;
+          const speechText = `${item.title}। मुख्य लाभ: ${item.benefit}। ${item.summary}। घर बैठे मात्र 50 रुपये में फॉर्म भरवाने के लिए फॉर्म भरवाएं बटन पर क्लिक करें।`;
+          try {
+            if ("speechSynthesis" in window) {
+              window.speechSynthesis.cancel();
+              const utter = new SpeechSynthesisUtterance(speechText);
+              utter.lang = "hi-IN";
+              utter.rate = 0.98;
+              window.speechSynthesis.speak(utter);
+              showToast("🔊 हिंदी ऑडियो गाइड चालू: " + item.title);
+            } else {
+              showToast("🔊 ऑडियो सारांश: " + item.title + " (" + item.benefit + ")");
+            }
+          } catch (e) {
+            showToast("🔊 ऑडियो सारांश: " + item.title);
+          }
+        });
+      });
+    }
+
+    function openSchemeModal(schemeId) {
+      const item = SCHEMES_DATA.find(s => s.id === schemeId);
+      if (!item) return;
+      document.getElementById("modal-category-badge").textContent = item.catLabel;
+      document.getElementById("modal-title").textContent = item.title;
+      document.getElementById("modal-desc").textContent = item.summary;
+      document.getElementById("modal-benefit").textContent = item.benefit;
+      document.getElementById("modal-deadline").textContent = item.deadline;
+
+      const docsList = document.getElementById("modal-docs-list");
+      docsList.innerHTML = item.docs.map(d => `<li>${d}</li>`).join("");
+
+      const officialLink = document.getElementById("modal-official-link");
+      officialLink.href = item.officialUrl;
+
+      const bookBtn = document.getElementById("modal-book-btn");
+      bookBtn.onclick = () => {
+        document.getElementById("scheme-modal").classList.add("hidden");
+        const selectEl = document.getElementById("book-scheme");
+        if (selectEl) selectEl.value = item.id;
+        switchPage("formseva");
+      };
+
+      document.getElementById("scheme-modal").classList.remove("hidden");
+    }
+
+    function answerAiQuestion(qText) {
+      const historyEl = document.getElementById("ai-chat-history");
+      if (!historyEl || !qText.trim()) return;
+
+      const qLower = qText.toLowerCase();
+      let reply = "";
+
+      if (qLower.includes("12") || qLower.includes("इंटर") || qLower.includes("स्कॉलरशिप") || qLower.includes("छात्र")) {
+        reply = `🎓 <strong>12वीं पास छात्रों के लिए टॉप 3 योजनाएं:</strong><br>
+        1. <strong>बिहार पोस्ट मैट्रिक स्कॉलरशिप:</strong> ₹2,000–₹15,000/वर्ष (BC/EBC/SC/ST)<br>
+        2. <strong>मुख्यमंत्री कन्या उत्थान:</strong> ₹25,000 (इंटर पास अविवाहित छात्राओं को)<br>
+        3. <strong>बिहार स्टूडेंट क्रेडिट कार्ड:</strong> आगे की पढ़ाई के लिए ₹4 लाख तक सहायता।`;
+      } else if (qLower.includes("उद्यमी") || qLower.includes("10 लाख") || qLower.includes("स्टार्टअप") || qLower.includes("बिज़नेस")) {
+        reply = `🏛️ <strong>मुख्यमंत्री उद्यमी योजना (₹10 लाख):</strong><br>
+        • इसमें ₹5 लाख अनुदान (माफ़) और ₹5 लाख बिना ब्याज/कम ब्याज आसान किस्तों पर मिलता है।<br>
+        • योग्यता: बिहार निवासी, उम्र 18–50 वर्ष, कम से कम 12वीं/ITI पास।`;
+      } else if (qLower.includes("फोटो") || qLower.includes("सिग्नेचर") || qLower.includes("size") || qLower.includes("kb")) {
+        reply = `📸 <strong>सरकारी फॉर्म फोटो/सिग्नेचर नियम:</strong><br>
+        • पासपोर्ट फोटो: 20KB से 50KB (3.5cm × 4.5cm) और नीचे नाम व तारीख (DOP) होनी चाहिए।<br>
+        • आप ऊपर <strong>🛠️ SaaS टूल्स</strong> टैब में जाकर 5 सेकंड में अपनी फोटो मुफ्त में रीसाइज कर सकते हैं!`;
+      } else if (qLower.includes("जाति") || qLower.includes("आय") || qLower.includes("निवास") || qLower.includes("rtps")) {
+        reply = `📄 <strong>RTPS बिहार (जाति/आय/निवास प्रमाण पत्र):</strong><br>
+        • इसके लिए केवल आधार कार्ड, फोटो और स्व-घोषणा पत्र लगता है। आप हमारे 'फॉर्म भरवाएं' पेज से मात्र ₹30 अतिरिक्त शुल्क में घर बैठे आवेदन करवा सकते हैं।`;
+      } else {
+        reply = `✨ <strong>Gaurav AI सुझाव:</strong> आपके प्रश्न <em>"${qText}"</em> के लिए हमारे पोर्टल पर <strong>बिहार उद्यमी योजना (₹10 लाख)</strong>, <strong>पोस्ट मैट्रिक स्कॉलरशिप</strong>, और <strong>SSC/BPSC भर्तियां</strong> उपलब्ध हैं। आप <strong>🎯 पात्रता चेकर</strong> टैब में जाकर अपनी उम्र के अनुसार सटीक लिस्ट देख सकते हैं!`;
+      }
+
+      historyEl.innerHTML += `
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-cyan-300 text-right">
+          👤 <strong>आप:</strong> ${qText}
+        </div>
+        <div class="p-3 rounded-2xl bg-indigo-950/80 border border-cyan-500/40 text-slate-100">
+          🤖 ${reply}
+        </div>
+      `;
+      historyEl.scrollTop = historyEl.scrollHeight;
+    }
+
+    function renderSarkariPhotoStudio() {
+      const canvas = document.getElementById("sarkari-photo-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const preset = document.getElementById("photo-preset-select")?.value || "passport";
+      const nameTxt = (document.getElementById("stamp-name-input")?.value || "GAURAV DUBEY").toUpperCase();
+      const dateTxt = (document.getElementById("stamp-date-input")?.value || "DOP: 24-10-2026").toUpperCase();
+      const showStamp = document.getElementById("stamp-toggle-check")?.checked ?? true;
+
+      if (preset === "signature") {
+        canvas.width = 320;
+        canvas.height = 140;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, 320, 140);
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(6, 6, 308, 128);
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "italic bold 28px serif";
+        ctx.textAlign = "center";
+        ctx.fillText(nameTxt, 160, 78);
+        ctx.font = "11px sans-serif";
+        ctx.fillStyle = "#64748b";
+        ctx.fillText("Official Exam Signature Format (10KB - 20KB)", 160, 118);
+        return;
+      }
+
+      canvas.width = 280;
+      canvas.height = 360;
+
+      const grad = ctx.createLinearGradient(0, 0, 0, 360);
+      grad.addColorStop(0, "#e0f2fe");
+      grad.addColorStop(1, "#bae6fd");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 280, 360);
+
+      if (uploadedCandidateImg) {
+        ctx.drawImage(uploadedCandidateImg, 0, 0, 280, showStamp ? 292 : 360);
+      } else {
+        ctx.fillStyle = "#0284c7";
+        ctx.beginPath();
+        ctx.arc(140, 115, 52, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#0369a1";
+        ctx.beginPath();
+        ctx.arc(140, 285, 95, Math.PI, 0, false);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("PASSPORT PHOTO", 140, 34);
+      }
+
+      if (showStamp) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 290, 280, 70);
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(2, 290, 276, 68);
+
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "center";
+        ctx.font = "bold 18px sans-serif";
+        ctx.fillText(nameTxt.slice(0, 22), 140, 320);
+        ctx.font = "bold 15px sans-serif";
+        ctx.fillText(dateTxt.slice(0, 22), 140, 346);
+      }
+
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(1.5, 1.5, 277, 357);
+    }
+
+    function initSaasToolsPage() {
+      renderSarkariPhotoStudio();
+
+      const fileInput = document.getElementById("photo-upload-input");
+      fileInput?.addEventListener("change", e => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            uploadedCandidateImg = img;
+            renderSarkariPhotoStudio();
+            showToast("📸 आपकी फोटो स्टैम्प के साथ तैयार है!");
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById("photo-preset-select")?.addEventListener("change", renderSarkariPhotoStudio);
+      document.getElementById("stamp-name-input")?.addEventListener("input", renderSarkariPhotoStudio);
+      document.getElementById("stamp-date-input")?.addEventListener("input", renderSarkariPhotoStudio);
+      document.getElementById("stamp-toggle-check")?.addEventListener("change", renderSarkariPhotoStudio);
+      document.getElementById("render-photo-stamp-btn")?.addEventListener("click", () => {
+        renderSarkariPhotoStudio();
+        showToast("✅ फोटो प्रीव्यू अपडेट हो गया!");
+      });
+
+      document.getElementById("download-stamped-photo-btn")?.addEventListener("click", () => {
+        const canvas = document.getElementById("sarkari-photo-canvas");
+        if (!canvas) return;
+        const a = document.createElement("a");
+        a.download = "sarkari-exam-photo-gaurav-saas.jpg";
+        a.href = canvas.toDataURL("image/jpeg", 0.88);
+        a.click();
+        showToast("⬇️ Exam-Ready फोटो डाउनलोड हो गई!");
+      });
+
+      document.getElementById("track-token-btn")?.addEventListener("click", () => {
+        const tk = (document.getElementById("track-token-input")?.value || "SK-2026-841").trim();
+        showToast("📡 टोकन " + tk + " का लाइव स्टेटस अपडेट किया गया!");
+      });
+
+      const selA = document.getElementById("cmp-scheme-a");
+      const selB = document.getElementById("cmp-scheme-b");
+      if (selA && selB) {
+        selA.innerHTML = SCHEMES_DATA.map((s, i) => `<option value="${s.id}" ${i===0?'selected':''}>${s.title}</option>`).join("");
+        selB.innerHTML = SCHEMES_DATA.map((s, i) => `<option value="${s.id}" ${i===1?'selected':''}>${s.title}</option>`).join("");
+
+        const updateComparison = () => {
+          const a = SCHEMES_DATA.find(s => s.id === selA.value) || SCHEMES_DATA[0];
+          const b = SCHEMES_DATA.find(s => s.id === selB.value) || SCHEMES_DATA[1];
+          const box = document.getElementById("cmp-result-box");
+          if (!box) return;
+          box.innerHTML = `
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 rounded-xl bg-slate-950 border border-cyan-500/30 space-y-1">
+                <div class="font-extrabold text-cyan-300">${a.title}</div>
+                <div class="text-emerald-400 font-bold">लाभ: ${a.benefit}</div>
+                <div class="text-slate-300">उम्र: ${a.minAge}–${a.maxAge} वर्ष</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-indigo-500/30 space-y-1">
+                <div class="font-extrabold text-indigo-300">${b.title}</div>
+                <div class="text-emerald-400 font-bold">लाभ: ${b.benefit}</div>
+                <div class="text-slate-300">उम्र: ${b.minAge}–${b.maxAge} वर्ष</div>
+              </div>
+            </div>
+          `;
+        };
+        selA.addEventListener("change", updateComparison);
+        selB.addEventListener("change", updateComparison);
+        updateComparison();
+      }
+    }
+
+    function runEligibilityCheck() {
+      const age = parseInt(document.getElementById("elig-age")?.value || "21", 10);
+      const edu = document.getElementById("elig-edu")?.value || "all";
+      const cat = document.getElementById("elig-cat")?.value || "all";
+      const inc = document.getElementById("elig-income")?.value || "under3";
+
+      const matches = SCHEMES_DATA.filter(item => {
+        const ageOk = age >= item.minAge && age <= item.maxAge;
+        const eduOk = edu === "all" || item.edu.includes("all") || item.edu.includes(edu);
+        const catOk = cat === "all" || item.caste.includes("all") || item.caste.includes(cat);
+        const incOk = item.income.includes(inc);
+        return ageOk && eduOk && catOk && incOk;
+      });
+
+      const summaryEl = document.getElementById("elig-result-summary");
+      const gridEl = document.getElementById("elig-results-grid");
+      if (summaryEl) {
+        summaryEl.textContent = `🎉 बधाई हो! आपकी प्रोफाइल के अनुसार ${matches.length} सरकारी योजनाएं और फॉर्म उपलब्ध हैं:`;
+      }
+      if (!gridEl) return;
+
+      gridEl.innerHTML = matches.map(item => `
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-xs font-bold text-cyan-300">${item.catLabel}</span>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300">98% पात्रता मैच</span>
+            </div>
+            <h4 class="text-base font-extrabold text-white">${item.title}</h4>
+            <p class="text-xs text-slate-300 mt-1">${item.summary}</p>
+            <div class="text-xs font-bold text-emerald-400 mt-2">🎁 लाभ: ${item.benefit}</div>
+          </div>
+          <div class="flex items-center gap-2 pt-2">
+            <button type="button" data-elig-book="${item.id}" class="elig-book-btn flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+              📝 ₹50 में फॉर्म बुक करें
+            </button>
+            <a href="${item.officialUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold">
+              🔗 पोर्टल
+            </a>
+          </div>
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".elig-book-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-elig-book");
+          const selectEl = document.getElementById("book-scheme");
+          if (selectEl && id) selectEl.value = id;
+          switchPage("formseva");
+        });
+      });
+    }
+
+    function initFormBookingPage() {
+      const selectEl = document.getElementById("book-scheme");
+      if (selectEl) {
+        selectEl.innerHTML = SCHEMES_DATA.map(s => `<option value="${s.id}">${s.title} (${s.benefit})</option>`).join("");
+      }
+
+      const updateFee = () => {
+        let total = 50;
+        if (document.getElementById("addon-cert")?.checked) total += 30;
+        if (document.getElementById("addon-alert")?.checked) total += 10;
+        const display = document.getElementById("total-service-fee-display");
+        if (display) display.textContent = "₹" + total;
+        return total;
+      };
+
+      document.getElementById("addon-cert")?.addEventListener("change", updateFee);
+      document.getElementById("addon-alert")?.addEventListener("change", updateFee);
+
+      const formEl = document.getElementById("expert-booking-form");
+      formEl?.addEventListener("submit", e => {
+        e.preventDefault();
+        const name = document.getElementById("book-name")?.value || "आवेदक";
+        const phone = document.getElementById("book-phone")?.value || "";
+        const schemeId = document.getElementById("book-scheme")?.value;
+        const district = document.getElementById("book-district")?.value || "बिहार";
+        const schemeObj = SCHEMES_DATA.find(s => s.id === schemeId) || SCHEMES_DATA[0];
+        const fee = updateFee();
+
+        const checkedDocs = Array.from(document.querySelectorAll(".doc-check:checked")).map(c => c.value);
+        const tokenNum = "SK-2026-" + Math.floor(1000 + Math.random() * 9000);
+
+        document.getElementById("receipt-token-id").textContent = "TOKEN #" + tokenNum;
+        document.getElementById("receipt-status-badge").textContent = "✅ Booking Confirmed";
+        document.getElementById("receipt-details-box").innerHTML = `
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+            <div><strong>आवेदक:</strong> ${name} (${district})</div>
+            <div><strong>मोबाइल:</strong> ${phone}</div>
+            <div><strong>फॉर्म:</strong> ${schemeObj.title}</div>
+            <div><strong>तैयार कागज़ात:</strong> ${checkedDocs.join(", ") || "कोई नहीं"}</div>
+            <div><strong>कुल सेवा शुल्क:</strong> <span class="text-emerald-400 font-bold">₹${fee}</span></div>
+          </div>
+          <p class="text-xs text-emerald-300 mt-2">🎉 आपका टोकन बन गया है! नीचे बटन दबाकर अपने डॉक्यूमेंट्स सीधे हमारे WhatsApp पर भेजें।</p>
+        `;
+
+        const waMsg = encodeURIComponent(
+          `नमस्ते गौरव दुबे सरकारी सेवा पोर्टल!\nमेरा बुकिंग टोकन: #${tokenNum}\nनाम: ${name}\nफॉर्म: ${schemeObj.title}\nमोबाइल: ${phone}\nसेवा शुल्क: ₹${fee}\nकृपया मेरा फॉर्म भरने की प्रक्रिया शुरू करें।`
+        );
+        const waBtn = document.getElementById("receipt-whatsapp-send");
+        if (waBtn) {
+          waBtn.href = `https://wa.me/${customLinks.whatsapp}?text=${waMsg}`;
+        }
+        showToast("🎉 बुकिंग कन्फर्म! टोकन #" + tokenNum + " तैयार है।");
+      });
+
+      const slider = document.getElementById("calc-forms-slider");
+      slider?.addEventListener("input", () => {
+        const count = parseInt(slider.value, 10);
+        document.getElementById("calc-forms-label").textContent = count + " फॉर्म/दिन";
+        const daily = count * 60;
+        const monthly = daily * 30;
+        document.getElementById("calc-daily-income").textContent = "₹" + daily.toLocaleString("en-IN") + " / दिन";
+        document.getElementById("calc-monthly-income").textContent = "₹" + monthly.toLocaleString("en-IN") + " / महीना";
+      });
+    }
+
+    function renderOfficialLinksHub() {
+      const grid = document.getElementById("official-links-grid");
+      if (!grid) return;
+
+      grid.innerHTML = OFFICIAL_PORTALS.map(p => `
+        <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="card-3d glass-panel rounded-2xl p-5 border border-slate-800 hover:border-cyan-400/60 flex flex-col justify-between gap-3 group">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300">${p.badge}</span>
+              <span class="text-xs text-slate-400 group-hover:text-cyan-300">↗ आधिकारिक लिंक</span>
+            </div>
+            <h4 class="text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors">${p.name}</h4>
+            <p class="text-xs text-slate-300 mt-1">${p.desc}</p>
+          </div>
+          <div class="text-xs font-mono text-cyan-400 truncate">${p.url}</div>
+        </a>
+      `).join("");
+
+      const waInput = document.getElementById("cfg-whatsapp");
+      const tgInput = document.getElementById("cfg-telegram");
+      const igInput = document.getElementById("cfg-insta");
+      if (waInput) waInput.value = customLinks.whatsapp;
+      if (tgInput) tgInput.value = customLinks.telegram;
+      if (igInput) igInput.value = customLinks.insta;
+
+      const applyCustomLinks = () => {
+        const heroWa = document.getElementById("hero-whatsapp-link");
+        const heroTg = document.getElementById("hero-telegram-link");
+        const heroIg = document.getElementById("hero-instagram-link");
+        if (heroWa) heroWa.href = `https://wa.me/${customLinks.whatsapp}`;
+        if (heroTg) heroTg.href = customLinks.telegram;
+        if (heroIg) heroIg.href = customLinks.insta;
+      };
+      applyCustomLinks();
+
+      document.getElementById("save-channel-links-btn")?.addEventListener("click", () => {
+        customLinks.whatsapp = (waInput?.value || "919876543210").trim();
+        customLinks.telegram = (tgInput?.value || "https://t.me/SarkariSevaPortal").trim();
+        customLinks.insta = (igInput?.value || "https://instagram.com").trim();
+        persistState();
+        applyCustomLinks();
+        showToast("✅ आपके सोशल चैनल लिंक्स पूरे 3D पोर्टल पर अपडेट हो गए!");
+      });
+    }
+
+    function renderAutomationSimulator() {
+      const item = SCHEMES_DATA[simIndex % SCHEMES_DATA.length];
+      simIndex++;
+
+      const postText = `📢 *${item.title}*
+
+✅ *किसके लिए है (पात्रता):* उम्र ${item.minAge} से ${item.maxAge} वर्ष (${item.catLabel})
+🎁 *मुख्य लाभ / पद:* ${item.benefit}
+📄 *ज़रूरी कागज़ात:* ${item.docs.join(", ")}
+⏳ *अंतिम तिथि:* ${item.deadline}
+
+💡 *घर बैठे बिना गलती फॉर्म भरवाएं:*
+क्या आपको खुद फॉर्म भरने या फोटो/दस्तावेज़ अपलोड करने में दिक्कत हो रही है? हमारे एक्सपर्ट्स से मात्र ₹50 सेवा शुल्क में घर बैठे अपना फॉर्म भरवाएं!
+👉 फॉर्म बुकिंग लिंक: ${customLinks.telegram}
+
+#SarkariYojana #BiharYojana #Scholarship #GauravDubey`;
+
+      const outputEl = document.getElementById("sim-post-output");
+      if (outputEl) outputEl.value = postText;
+
+      drawPosterCanvas(item);
+    }
+
+    function drawPosterCanvas(item) {
+      const canvas = document.getElementById("poster-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const grad = ctx.createLinearGradient(0, 0, 600, 380);
+      grad.addColorStop(0, "#0f172a");
+      grad.addColorStop(0.5, "#1e1b4b");
+      grad.addColorStop(1, "#064e3b");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 380);
+
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(14, 14, 572, 352);
+
+      ctx.fillStyle = "#0284c7";
+      ctx.fillRect(30, 30, 340, 32);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText("🔥 जन-सेवा 3D पोर्टल • By Gaurav Dubey", 42, 51);
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "bold 22px sans-serif";
+      ctx.fillText(item.title.slice(0, 36), 30, 100);
+
+      ctx.fillStyle = "rgba(16, 185, 129, 0.22)";
+      ctx.fillRect(30, 120, 540, 54);
+      ctx.fillStyle = "#34d399";
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillText("🎁 लाभ: " + item.benefit.slice(0, 42), 44, 153);
+
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "15px sans-serif";
+      ctx.fillText("📄 ज़रूरी कागज़ात:", 30, 205);
+      item.docs.slice(0, 3).forEach((doc, idx) => {
+        ctx.fillStyle = "#bae6fd";
+        ctx.fillText("• " + doc.slice(0, 48), 45, 232 + idx * 26);
+      });
+
+      ctx.fillStyle = "#f59e0b";
+      ctx.fillRect(30, 315, 540, 36);
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("📝 घर बैठे मात्र ₹50 में फॉर्म भरवाने के लिए बायो/लिंक पर क्लिक करें!", 45, 338);
+    }
+
+    let bgAnimId = null;
+    let heroAnimId = null;
+    let isSpinning = true;
+
+    function initFullScreenWebGLUniverse() {
+      const canvas = document.getElementById("bg-webgl-canvas");
+      if (!canvas || typeof THREE === "undefined") return;
+      if (bgAnimId) cancelAnimationFrame(bgAnimId);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 2.2, 8);
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      const gridHelper = new THREE.GridHelper(60, 45, 0x06b6d4, 0x1e293b);
+      gridHelper.position.y = -2.8;
+      scene.add(gridHelper);
+
+      const crystals = [];
+      const geo = new THREE.OctahedronGeometry(0.45, 0);
+      for (let i = 0; i < 18; i++) {
+        const mat = new THREE.MeshBasicMaterial({
+          color: i % 2 === 0 ? 0x38bdf8 : 0x6366f1,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.25
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(
+          (Math.random() - 0.5) * 26,
+          (Math.random() - 0.2) * 12,
+          (Math.random() - 0.5) * 18 - 4
+        );
+        scene.add(mesh);
+        crystals.push(mesh);
+      }
+
+      let mouseX = 0;
+      let mouseY = 0;
+      window.addEventListener("mousemove", e => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 1.8;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 1.2;
+      });
+
+      function animateBg() {
+        bgAnimId = requestAnimationFrame(animateBg);
+        gridHelper.position.z = (gridHelper.position.z + 0.025) % 1.33;
+        crystals.forEach((c, idx) => {
+          c.rotation.x += 0.004 + idx * 0.0003;
+          c.rotation.y += 0.006;
+        });
+        camera.position.x += (mouseX - camera.position.x) * 0.04;
+        camera.position.y += (2.2 - mouseY - camera.position.y) * 0.04;
+        camera.lookAt(0, 0, -4);
+        renderer.render(scene, camera);
+      }
+      animateBg();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function initThreeHero() {
+      const container = document.getElementById("three-container");
+      const canvas = document.getElementById("three-hero-canvas");
+      if (!container || !canvas || typeof THREE === "undefined") return;
+
+      if (heroAnimId) cancelAnimationFrame(heroAnimId);
+
+      const scene = new THREE.Scene();
+      const width = container.clientWidth || 400;
+      const height = container.clientHeight || 270;
+
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.z = 5.4;
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      const rootGroup = new THREE.Group();
+      scene.add(rootGroup);
+
+      const globeGroup = new THREE.Group();
+      const sphereGeo = new THREE.IcosahedronGeometry(1.55, 2);
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.65 });
+      globeGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
+
+      const coreGeo = new THREE.IcosahedronGeometry(0.95, 1);
+      const coreMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true, transparent: true, opacity: 0.85 });
+      globeGroup.add(new THREE.Mesh(coreGeo, coreMat));
+
+      const ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.05, 0.035, 16, 90), new THREE.MeshBasicMaterial({ color: 0x10b981 }));
+      ring1.rotation.x = Math.PI / 2.4;
+      globeGroup.add(ring1);
+
+      const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.025, 16, 90), new THREE.MeshBasicMaterial({ color: 0x818cf8 }));
+      ring2.rotation.y = Math.PI / 3;
+      globeGroup.add(ring2);
+      rootGroup.add(globeGroup);
+
+      const torusGroup = new THREE.Group();
+      const knotGeo = new THREE.TorusKnotGeometry(1.25, 0.34, 110, 16);
+      const knotMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee, wireframe: true });
+      torusGroup.add(new THREE.Mesh(knotGeo, knotMat));
+      torusGroup.visible = false;
+      rootGroup.add(torusGroup);
+
+      const pillarsGroup = new THREE.Group();
+      for (let i = 0; i < 6; i++) {
+        const boxG = new THREE.BoxGeometry(0.45, 2.2, 0.45);
+        const boxM = new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0xf59e0b : 0x38bdf8, wireframe: true });
+        const pillar = new THREE.Mesh(boxG, boxM);
+        const angle = (i / 6) * Math.PI * 2;
+        pillar.position.set(Math.cos(angle) * 1.6, 0, Math.sin(angle) * 1.6);
+        pillarsGroup.add(pillar);
+      }
+      pillarsGroup.visible = false;
+      rootGroup.add(pillarsGroup);
+
+      const partCount = 150;
+      const pArr = new Float32Array(partCount * 3);
+      for (let i = 0; i < partCount * 3; i++) pArr[i] = (Math.random() - 0.5) * 6.5;
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute("position", new THREE.BufferAttribute(pArr, 3));
+      const pMat = new THREE.PointsMaterial({ size: 0.055, color: 0x38bdf8 });
+      const pMesh = new THREE.Points(pGeo, pMat);
+      scene.add(pMesh);
+
+      let targetRotX = 0;
+      let targetRotY = 0;
+      container.addEventListener("mousemove", e => {
+        const rect = container.getBoundingClientRect();
+        targetRotY = (((e.clientX - rect.left) / rect.width) - 0.5) * 2.2;
+        targetRotX = (((e.clientY - rect.top) / rect.height) - 0.5) * 1.6;
+      });
+
+      window.setThreeSceneMode = mode => {
+        globeGroup.visible = mode === "globe";
+        torusGroup.visible = mode === "torus";
+        pillarsGroup.visible = mode === "pillars";
+      };
+
+      function animateHero() {
+        heroAnimId = requestAnimationFrame(animateHero);
+        if (isSpinning) {
+          rootGroup.rotation.y += 0.011;
+          rootGroup.rotation.x += 0.004;
+          ring1.rotation.z += 0.015;
+          ring2.rotation.x -= 0.012;
+          pMesh.rotation.y -= 0.003;
+        }
+        rootGroup.rotation.y += (targetRotY - rootGroup.rotation.y) * 0.06;
+        rootGroup.rotation.x += (targetRotX - rootGroup.rotation.x) * 0.06;
+        renderer.render(scene, camera);
+      }
+      animateHero();
+
+      window.addEventListener("resize", () => {
+        const nw = container.clientWidth || 400;
+        const nh = container.clientHeight || 270;
+        camera.aspect = nw / nh;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nw, nh);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderSchemesGrid();
+      runEligibilityCheck();
+      initFormBookingPage();
+      renderOfficialLinksHub();
+      renderAutomationSimulator();
+      initSaasToolsPage();
+      initFullScreenWebGLUniverse();
+      initThreeHero();
+
+      document.querySelectorAll(".nav-tab-btn, .footer-nav-link").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const page = btn.getAttribute("data-page");
+          if (page) switchPage(page);
+        });
+      });
+
+      document.getElementById("brand-home-btn")?.addEventListener("click", () => switchPage("home"));
+      document.getElementById("hero-book-form-btn")?.addEventListener("click", () => switchPage("formseva"));
+      document.getElementById("hero-check-elig-btn")?.addEventListener("click", () => switchPage("eligibility"));
+      document.getElementById("hero-open-saas-btn")?.addEventListener("click", () => switchPage("saastools"));
+      document.getElementById("founder-open-tools-btn")?.addEventListener("click", () => switchPage("saastools"));
+      document.getElementById("hero-open-automation-btn")?.addEventListener("click", () => switchPage("automation"));
+
+      document.querySelectorAll(".scene-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const mode = btn.getAttribute("data-scene-mode") || "globe";
+          if (typeof window.setThreeSceneMode === "function") window.setThreeSceneMode(mode);
+          document.querySelectorAll(".scene-mode-btn").forEach(b => {
+            b.className = "scene-mode-btn px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-300 hover:bg-slate-700 font-bold text-xs transition-all";
+          });
+          btn.className = "scene-mode-btn px-2.5 py-1 rounded-lg bg-cyan-500 text-slate-950 font-extrabold text-xs transition-all";
+        });
+      });
+
+      document.querySelectorAll(".deck-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const mode = btn.getAttribute("data-deck-mode") || "grid";
+          const grid = document.getElementById("schemes-grid");
+          if (grid) {
+            grid.classList.remove("deck-coverflow", "deck-isometric");
+            if (mode === "coverflow") grid.classList.add("deck-coverflow");
+            if (mode === "isometric") grid.classList.add("deck-isometric");
+          }
+          document.querySelectorAll(".deck-mode-btn").forEach(b => {
+            b.className = "deck-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold text-slate-300 hover:text-white";
+          });
+          btn.className = "deck-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950";
+          showToast("🧊 3D व्यू मोड बदला गया: " + mode.toUpperCase());
+        });
+      });
+
+      document.querySelectorAll(".cat-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentCategory = btn.getAttribute("data-cat") || "all";
+          document.querySelectorAll(".cat-btn").forEach(b => {
+            b.className = "cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0";
+          });
+          btn.className = "cat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-cyan-500 text-slate-950 shrink-0 shadow-md shadow-cyan-500/20";
+          renderSchemesGrid();
+        });
+      });
+
+      document.getElementById("scheme-search-input")?.addEventListener("input", renderSchemesGrid);
+      document.getElementById("urgent-only-checkbox")?.addEventListener("change", renderSchemesGrid);
+      document.getElementById("run-elig-check-btn")?.addEventListener("click", () => {
+        runEligibilityCheck();
+        showToast("🎯 आपकी पात्रता के अनुसार सूची अपडेट हो गई!");
+      });
+
+      document.querySelectorAll(".ai-chip-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const q = btn.getAttribute("data-ai-q") || "";
+          answerAiQuestion(q);
+        });
+      });
+      document.getElementById("ai-chat-send-btn")?.addEventListener("click", () => {
+        const inp = document.getElementById("ai-chat-input");
+        if (!inp || !inp.value.trim()) return;
+        answerAiQuestion(inp.value.trim());
+        inp.value = "";
+      });
+      document.getElementById("ai-chat-input")?.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("ai-chat-send-btn")?.click();
+        }
+      });
+
+      document.getElementById("close-modal-btn")?.addEventListener("click", () => {
+        document.getElementById("scheme-modal")?.classList.add("hidden");
+      });
+
+      const spinBtn = document.getElementById("toggle-3d-spin-btn");
+      spinBtn?.addEventListener("click", () => {
+        isSpinning = !isSpinning;
+        spinBtn.textContent = isSpinning ? "⏸ 3D रोटेशन रोकें" : "▶️ 3D रोटेशन चलाएं";
+      });
+
+      document.getElementById("sim-generate-btn")?.addEventListener("click", () => {
+        renderAutomationSimulator();
+        showToast("⚡ AI ने नई योजना का पोस्ट और पोस्टर तैयार कर दिया!");
+      });
+
+      document.getElementById("copy-sim-post-btn")?.addEventListener("click", () => {
+        const val = document.getElementById("sim-post-output")?.value || "";
+        copyTextSafe(val, "Telegram/WhatsApp पोस्ट");
+      });
+
+      document.getElementById("download-poster-btn")?.addEventListener("click", () => {
+        const canvas = document.getElementById("poster-canvas");
+        if (!canvas) return;
+        const link = document.createElement("a");
+        link.download = "sarkari-yojana-poster-gaurav-dubey.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("⬇️ पोस्टर PNG डाउनलोड हो गया!");
+      });
+
+      document.getElementById("copy-prompt-btn")?.addEventListener("click", () => {
+        const txt = document.getElementById("master-prompt-code")?.textContent || "";
+        copyTextSafe(txt, "Master AI Prompt");
+      });
+
+      document.getElementById("copy-python-btn")?.addEventListener("click", () => {
+        const txt = document.getElementById("python-script-code")?.textContent || "";
+        copyTextSafe(txt, "Python Automation Code");
+      });
+    });
+  </script>
+</body>
+</html>
